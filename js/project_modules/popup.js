@@ -1,17 +1,6 @@
-const mapPopupTemplate = document.querySelector('#card').content.querySelector('.popup');
+import { compareTypes } from './util.js';
 
-const compareTypes = (type) => {
-  switch (type) {
-    case 'flat':
-      return 'Квартира';
-    case 'bungalow':
-      return 'Бунгало';
-    case 'house':
-      return 'Дом';
-    case 'palace':
-      return 'Дворец';
-  }
-};
+const mapPopupTemplate = document.querySelector('#card').content.querySelector('.popup');
 
 const hideElement = (item) => item.classList.add('hidden');
 

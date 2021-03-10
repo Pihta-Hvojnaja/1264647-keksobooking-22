@@ -117,9 +117,7 @@ L.tileLayer(
 
 //Блокируем поле адресс для редактирования, передаем в него координаты меток
 addressAd.readOnly = true;
-
 getAddress(mainMarker, addressAd);
-
 mainMarker.on('move', (evt) => getAddress(evt.target, addressAd));
 
 export { rollBackMap };
