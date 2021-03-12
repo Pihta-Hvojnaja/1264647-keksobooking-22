@@ -15,12 +15,6 @@ const enableElements = (parent, children) => {
   }
 };
 
-//Получение адреса метки
-const getAddress = (marker, input) => {
-  const source = marker.getLatLng();
-  input.value = (source.lat).toFixed(5) + ', '+ (source.lng).toFixed(5);
-};
-
 //Проверка событий
 const isClickEvent = (evt) => {
   return evt.type === 'click';
@@ -121,7 +115,6 @@ const checkInput = (input) => {
 export {
   disableElements,
   enableElements,
-  getAddress,
   isClickEvent,
   isEscEvent,
   compareTypes,

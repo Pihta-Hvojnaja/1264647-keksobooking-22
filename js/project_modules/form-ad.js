@@ -8,14 +8,18 @@ import {
 } from './util.js';
 
 import { sendData } from './api.js';
-import { rollBackMap } from './map.js';
 import { showNotice } from './notification.js';
+import { formFilter } from './form-filter.js';
 
-const formFilter = document.querySelector('.map__filters');
+const DEFAULT_CAPACITY_GUESTS = '1';
+
 const formAd = document.querySelector('.ad-form');
+const formAdElements = formAd.querySelectorAll('.ad-form-header, .ad-form__element');
+
 const formAdReset = formAd.querySelector('.ad-form__reset');
 
 const inputTitleAd = formAd.querySelector('#title');
+const addressAd = formAd.querySelector('#address');
 
 const selectTypeAd = formAd.querySelector('#type');
 const inputPriceAd = formAd.querySelector('#price');
@@ -26,7 +30,29 @@ const selectTimeoutAd = formAd.querySelector('#timeout');
 const selectRoomAd = formAd.querySelector('#room_number');
 const selectCapacityAd = formAd.querySelector('#capacity');
 
+//ДЕАКТИВАЦИЯ-АКТИВАЦИЯ ФОРМЫ ОБЪЯВЛЕНИЯ
+const deactivatingFormAd = (cb) => {
+  cb(formAd, formAdElements);
+};
+
+const activatingFormAd = (cb) => {
+  cb(formAd, formAdElements);
+};
+
+//ПОЛУЧЕНИЯ АДРЕСА ДЛЯ ПОЛЯ АДРЕС
+const getAddress = (marker) => {
+  const source = marker.getLatLng();
+  addressAd.value = (source.lat).toFixed(5) + ', '+ (source.lng).toFixed(5);
+};
+//блокируем адресную строку для редактирования
+addressAd.readOnly = true;
+
 //ОТПРАВКА, СБРОС ФОРМЫ
+let rollBackMap;
+const passRollBackMap = (passedFunction) => {
+  rollBackMap = passedFunction;
+};
+
 const resetFormMap = () => {
   formFilter.reset();
   formAd.reset();
@@ -84,24 +110,27 @@ selectTimeoutAd.addEventListener('change', () => {
 });
 
 //Синхронизация валидации полей «Количество комнат» и «Количество мест»
-selectCapacityAd.value = '1';
+selectCapacityAd.value = DEFAULT_CAPACITY_GUESTS;
 
 selectRoomAd.addEventListener('change', () => {
-  const quantityRooms = selectRoomAd.value;
-  const quantityGuests = selectCapacityAd.value;
 
   selectRoomAd.style.boxShadow = 'none';
 
-  showMessageError(quantityRooms, quantityGuests, selectCapacityAd);
+  showMessageError(selectRoomAd.value, selectCapacityAd.value, selectCapacityAd);
   checkSelect(selectRoomAd, selectCapacityAd);
 });
 
 selectCapacityAd.addEventListener('change', () => {
-  const quantityRooms = selectRoomAd.value;
-  const quantityGuests = selectCapacityAd.value;
 
   selectCapacityAd.style.boxShadow = 'none';
 
-  showMessageError(quantityRooms, quantityGuests, selectRoomAd);
+  showMessageError(selectRoomAd.value, selectCapacityAd.value, selectRoomAd);
   checkSelect(selectCapacityAd, selectRoomAd);
 });
+
+export {
+  passRollBackMap,
+  deactivatingFormAd,
+  activatingFormAd,
+  getAddress
+};
