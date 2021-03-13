@@ -78,7 +78,7 @@ const createMarkersAds = (ads) => {
   const markers = [];
 
   ads.forEach((ad) => {
-
+    
     if (compareAdAndFilter(ad)) {
       const markerIcon = L.icon({
         iconUrl: ICON_URL,
@@ -169,7 +169,7 @@ L.tileLayer(
         addHandlerChange(
           debounce(
             () => createMarkersAds(ads),
-            
+
             RERENDER_DELAY,
           ),
         );

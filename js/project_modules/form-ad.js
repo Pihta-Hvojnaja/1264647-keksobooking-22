@@ -1,9 +1,11 @@
 import {
   setMinPrice,
   correlateOptions,
+  validateSelector,
   showMessageError,
   checkSelect,
-  checkInput
+  checkInput,
+  rollbackStyle
 } from './util.js';
 
 import { sendData } from './api.js';
@@ -62,6 +64,7 @@ const getAddress = (marker) => {
  * Ф-ции отправки, сброса формы объявления и фильтра карты
  */
 
+//получаем ф-цию rollBackMap из map.js для отката карты и маркера
 const passRollBackMap = (passedFunction) => {
   rollBackMap = passedFunction;
 };
@@ -70,6 +73,11 @@ const resetFormsAndMap = () => {
   resetFormFilter();
   formAd.reset();
   rollBackMap();
+
+  rollbackStyle(inputTitleAd);
+  rollbackStyle(inputPriceAd);
+  rollbackStyle(selectRoomAd);
+  rollbackStyle(selectCapacityAd);
 }
 
 const onFormSend = () => {
@@ -92,7 +100,7 @@ addressAd.readOnly = true;
    ========================================================================== */
 
 /**
- * Отправляем данные формы
+ * Отправка данных формы
  */
 
 formAd.addEventListener('submit', (evt) => {
@@ -159,7 +167,8 @@ selectRoomAd.addEventListener('change', () => {
 
   selectRoomAd.style.boxShadow = 'none';
 
-  showMessageError(selectRoomAd.value, selectCapacityAd.value, selectCapacityAd);
+  const selectStatus = validateSelector(selectRoomAd.value, selectCapacityAd.value, selectCapacityAd)
+  showMessageError(selectStatus, selectCapacityAd, selectRoomAd);
   checkSelect(selectRoomAd, selectCapacityAd);
 });
 
@@ -168,7 +177,8 @@ selectCapacityAd.addEventListener('change', () => {
 
   selectCapacityAd.style.boxShadow = 'none';
 
-  showMessageError(selectRoomAd.value, selectCapacityAd.value, selectRoomAd);
+  const selectStatus = validateSelector(selectRoomAd.value, selectCapacityAd.value, selectRoomAd)
+  showMessageError(selectStatus, selectRoomAd, selectCapacityAd);
   checkSelect(selectCapacityAd, selectRoomAd);
 });
 

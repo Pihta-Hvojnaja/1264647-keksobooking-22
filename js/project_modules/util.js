@@ -99,8 +99,7 @@ const correlateOptions = (fromOption, forOption) => {
 /* Валидация полей
    ========================================================================== */
 
-const showMessageError = (quantityRooms, quantityGuests, selectMessageError) => {
-
+const validateSelector = (quantityRooms, quantityGuests, selectMessageError) => {
   if (quantityRooms === '1' && quantityGuests !== '1') {
     selectMessageError.
       setCustomValidity('1 комната подходит только для 1-го гостя');
@@ -118,7 +117,15 @@ const showMessageError = (quantityRooms, quantityGuests, selectMessageError) => 
       setCustomValidity('100 комнат не для гостей');
 
   } else {
+    return true;
+  }
+};
+
+const showMessageError = (selectStatus, selectMessageError, selectFocus) => {
+
+  if (selectStatus) {
     selectMessageError.setCustomValidity('');
+    selectFocus.setCustomValidity('');
   }
 
   selectMessageError.reportValidity();
@@ -148,10 +155,50 @@ const checkInput = (input) => {
   });
 };
 
+const rollbackStyle = (element) => element.style.boxShadow = null;
+
 /* Фильтрация объявлений
    ========================================================================== */
 
-const getCheckedCheckBoxes = (parentFeatures) => {
+/**
+ * Фильтрация селекторов
+ */
+
+const filterType = (valueSelect, valueAd) => {
+  return (valueSelect !== valueAd && valueSelect !== 'any') ? false : true;
+};
+
+const filterPrice = (valueSelect, valueAd) => {
+  if (valueSelect === 'any') {
+    return true;
+
+  } else {
+
+    if (valueSelect === 'low' && valueAd > 10000) {
+      return false;
+
+    } else if (valueSelect === 'middle' && (valueAd <= 10000 || valueAd >= 50000)) {
+      return false;
+
+    } else if (valueSelect === 'high' && valueAd < 50000) {
+      return false;
+
+    } else {
+      return true;
+    }
+  }
+};
+
+const filterRoomsGuests = (valueSelect, valueAd) => {
+  valueAd = String(valueAd);
+  return (valueSelect !== valueAd && valueSelect !== 'any') ? false : true;
+};
+
+/**
+ * Фильтрация чекбоксов "особенности жилья"
+ */
+
+const getCheckedValue = (parentFeatures) => {
   const activeFeatures = parentFeatures.querySelectorAll('input:checked');
   return Array.from(activeFeatures).map((cb) => cb.value);
 }
@@ -174,7 +221,7 @@ const compareCheckedValue = (checkedValues, adFeatures) => {
 };
 
 
-/* Устраняем дребезг
+/* Устранение дребезга
    ========================================================================== */
 
 const debounce = (cb, timeout) => {
@@ -206,10 +253,15 @@ export {
   compareTypes,
   setMinPrice,
   correlateOptions,
+  validateSelector,
   showMessageError,
   checkSelect,
   checkInput,
-  getCheckedCheckBoxes,
+  rollbackStyle,
+  filterType,
+  filterPrice,
+  filterRoomsGuests,
+  getCheckedValue,
   compareCheckedValue,
   debounce
 };

@@ -1,5 +1,8 @@
 import {
-  getCheckedCheckBoxes,
+  filterType,
+  filterPrice,
+  filterRoomsGuests,
+  getCheckedValue,
   compareCheckedValue
 } from './util.js';
 
@@ -10,11 +13,11 @@ import {
 const formFilter = document.querySelector('.map__filters');
 const formFilterElements = formFilter.querySelectorAll('.map__filter, .map__features');
 
-const housingTypeFilter = formFilter.querySelector('#housing-type');
-const housingPriceFilter = formFilter.querySelector('#housing-price');
-const housingRoomsFilter = formFilter.querySelector('#housing-rooms');
-const housingGuestsFilter = formFilter.querySelector('#housing-guests');
-const housingFeaturesFilter = formFilter.querySelector('#housing-features');
+const typeFilter = formFilter.querySelector('#housing-type');
+const priceFilter = formFilter.querySelector('#housing-price');
+const roomsFilter = formFilter.querySelector('#housing-rooms');
+const guestsFilter = formFilter.querySelector('#housing-guests');
+const featuresFilter = formFilter.querySelector('#housing-features');
 
 /* Функции
    ========================================================================== */
@@ -38,28 +41,11 @@ const activatingFormFilter = (cb) => {
 const resetFormFilter = () => formFilter.reset();
 
 /**
- * Ф-ции обработчиков изменений фильтров
+ * Ф-ция-обработчик изменений фильтра
  */
 
 const addHandlerChange = (cb) => {
-  //обработчик "тип жилья"
-  housingTypeFilter.addEventListener('change', () => {
-    cb();
-  });
-  //обработчик "цена за ночь"
-  housingPriceFilter.addEventListener('change', () => {
-    cb();
-  });
-  //обработчик "кол-во комнат"
-  housingRoomsFilter.addEventListener('change', () => {
-    cb();
-  });
-  //обработчик "кол-во гостей"
-  housingGuestsFilter.addEventListener('change', () => {
-    cb();
-  });
-  //обработчик чекбоксов "особенности жилья"
-  housingFeaturesFilter.addEventListener('change', () => {
+  formFilter.addEventListener('change', () => {
     cb();
   });
 };
@@ -69,45 +55,23 @@ const addHandlerChange = (cb) => {
  */
 
 const compareAdAndFilter = (ad) => {
-  //сравнение с фильтром "тип жилья"
-  let valueSelect = housingTypeFilter.value;
-  let valueAd = ad.offer.type;
-  if (valueSelect !== valueAd && valueSelect !== 'any') {
-    return false;
-  }
-  //сравнение с фильтром "цена"
-  valueSelect = housingPriceFilter.value;
-  valueAd = ad.offer.price;
-  if (valueSelect !== 'any') {
-    if (valueSelect === 'low' && valueAd > 10000) {
-      return false;
-    }
 
-    if (valueSelect === 'middle' && (valueAd <= 10000 || valueAd >= 50000)) {
-      return false;
-    }
+  //фильтрация "тип жилья"
+  if (!filterType(typeFilter.value, ad.offer.type)) return false;
 
-    if (valueSelect === 'high' && valueAd < 50000) {
-      return false;
-    }
-  }
-  //сравнение с фильтром "кол-во комнат"
-  valueSelect = housingRoomsFilter.value;
-  valueAd = ad.offer.rooms + '';
-  if (valueSelect !== valueAd && valueSelect !== 'any') {
-    return false;
-  }
-  //сравнение с фильтром "кол-во гостей"
-  valueSelect = housingGuestsFilter.value;
-  valueAd = ad.offer.guests + '';
-  if (valueSelect !== valueAd && valueSelect !== 'any') {
-    return false;
-  }
-  //сравнение с чекбоксами "особенности"
-  const checkedValues = getCheckedCheckBoxes(housingFeaturesFilter);
-  if (compareCheckedValue(checkedValues, ad.offer.features) === false) {
-    return false;
-  }
+  //фильтрация "цена"
+  if (!filterPrice(priceFilter.value, ad.offer.price)) return false;
+
+  //фильтрация "кол-во комнат"
+  if (!filterRoomsGuests(roomsFilter.value, ad.offer.rooms)) return false;
+
+  //фильтрация "кол-во гостей"
+  if (!filterRoomsGuests(guestsFilter.value, ad.offer.guests)) return false;
+
+  //фильтрация "особенности"
+  const resultCompare = compareCheckedValue(getCheckedValue(featuresFilter), ad.offer.features);
+
+  if (resultCompare === false) return false;
 
   return true;
 };
