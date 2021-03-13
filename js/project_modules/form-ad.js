@@ -3,7 +3,6 @@ import {
   correlateOptions,
   validateSelector,
   showMessageError,
-  checkSelect,
   checkInput,
   rollbackStyle
 } from './util.js';
@@ -169,7 +168,6 @@ selectRoomAd.addEventListener('change', () => {
 
   const selectStatus = validateSelector(selectRoomAd.value, selectCapacityAd.value, selectCapacityAd)
   showMessageError(selectStatus, selectCapacityAd, selectRoomAd);
-  checkSelect(selectRoomAd, selectCapacityAd);
 });
 
 //гости
@@ -179,7 +177,6 @@ selectCapacityAd.addEventListener('change', () => {
 
   const selectStatus = validateSelector(selectRoomAd.value, selectCapacityAd.value, selectRoomAd)
   showMessageError(selectStatus, selectRoomAd, selectCapacityAd);
-  checkSelect(selectCapacityAd, selectRoomAd);
 });
 
 export {

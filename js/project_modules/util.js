@@ -126,20 +126,15 @@ const showMessageError = (selectStatus, selectMessageError, selectFocus) => {
   if (selectStatus) {
     selectMessageError.setCustomValidity('');
     selectFocus.setCustomValidity('');
+
+    selectMessageError.style.boxShadow = '0 0 1px 0 #008000';
+    selectFocus.style.boxShadow = '0 0 1px 0 #008000';
+
+  } else {
+    selectMessageError.style.boxShadow = null;
   }
 
   selectMessageError.reportValidity();
-};
-
-const checkSelect = (selectFocus, selectCheck) => {
-
-  if (selectCheck.validity.valid) {
-    selectFocus.style.boxShadow = '0 0 1px 0 #008000';
-    selectCheck.style.boxShadow = '0 0 1px 0 #008000';
-
-  } else {
-    selectCheck.style.boxShadow = '0 0 2px 2px #ff6547';
-  }
 };
 
 const checkInput = (input) => {
@@ -150,7 +145,7 @@ const checkInput = (input) => {
       input.style.boxShadow = '0 0 1px 0 #008000';
 
     } else {
-      input.style.boxShadow = '0 0 2px 2px #ff6547';
+      input.style.boxShadow = null;
     }
   });
 };
@@ -255,7 +250,6 @@ export {
   correlateOptions,
   validateSelector,
   showMessageError,
-  checkSelect,
   checkInput,
   rollbackStyle,
   filterType,
