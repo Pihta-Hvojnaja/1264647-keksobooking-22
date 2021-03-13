@@ -1,3 +1,4 @@
+
 const URL_GET_DATA = 'https://22.javascript.pages.academy/keksobooking/data';
 const URL_SEND_DATA = 'https://22.javascript.pages.academy/keksobooking';
 

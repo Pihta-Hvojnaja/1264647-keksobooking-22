@@ -1,30 +1,22 @@
-import { compareTypes } from './util.js';
+import {
+  hideElement,
+  addInnerElements,
+  compareTypes
+} from './util.js';
+
+
+/* Переменные
+   ========================================================================== */
 
 const mapPopupTemplate = document.querySelector('#card').content.querySelector('.popup');
 
-const hideElement = (item) => item.classList.add('hidden');
 
-const addInnerElements = (parent, items, htmlTag) => {
-  if (items.length === 0) {
-    return hideElement(parent);
-  }
+/* Функции
+   ========================================================================== */
 
-  parent.innerHTML = '';
-
-  items.forEach((item) => {
-    let childTag;
-
-    if (htmlTag === 'li') {
-      childTag = `<li class="popup__feature popup__feature--${item}"></li>`;
-    }
-
-    if (htmlTag === 'img') {
-      childTag = `<img src="${item}" class="popup__photo" width="45" height="40" alt="Фотография жилья">`;
-    }
-
-    parent.insertAdjacentHTML('beforeend', childTag);
-  });
-}
+/**
+ * Ф-ция создания объявления
+ */
 
 const createPopup = (ad) => {
   const mapPopup = mapPopupTemplate.cloneNode(true);
@@ -72,7 +64,10 @@ const createPopup = (ad) => {
 
   //Вместимость жилья
   element = mapPopup.querySelector('.popup__text--capacity');
-  if (ad.offer.rooms && ad.offer.guests || ad.offer.guests === 0) {
+
+  if ((ad.offer.rooms || ad.offer.rooms === 0) &&
+      (ad.offer.guests || ad.offer.guests === 0)) {
+
     element.textContent = `${ad.offer.rooms} комнаты для ${ad.offer.guests} гостей`;
   } else {
     hideElement(element);

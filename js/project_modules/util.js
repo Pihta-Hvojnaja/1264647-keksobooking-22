@@ -1,4 +1,7 @@
-//Вкл - Выкл элементов
+
+/* Вкл - Выкл элементов
+   ========================================================================== */
+
 const disableElements = (parent, children) => {
   parent.classList.add('ad-form--disabled');
 
@@ -15,7 +18,9 @@ const enableElements = (parent, children) => {
   }
 };
 
-//Проверка событий
+/* Проверка событий
+   ========================================================================== */
+
 const isClickEvent = (evt) => {
   return evt.type === 'click';
 };
@@ -24,7 +29,36 @@ const isEscEvent = (evt) => {
   return evt.key === ('Escape' || 'Esc');
 };
 
-//корреляция значений полей
+/* Размещение похожих объявлений в балунах
+   ========================================================================== */
+
+const hideElement = (item) => item.classList.add('hidden');
+
+const addInnerElements = (parent, items, htmlTag) => {
+  if (items.length === 0) {
+    return hideElement(parent);
+  }
+
+  parent.innerHTML = '';
+
+  items.forEach((item) => {
+    let childTag;
+
+    if (htmlTag === 'li') {
+      childTag = `<li class="popup__feature popup__feature--${item}"></li>`;
+    }
+
+    if (htmlTag === 'img') {
+      childTag = `<img src="${item}" class="popup__photo" width="45" height="40" alt="Фотография жилья">`;
+    }
+
+    parent.insertAdjacentHTML('beforeend', childTag);
+  });
+}
+
+/* Корреляция значений полей
+   ========================================================================== */
+
 const compareTypes = (type) => {
   switch (type) {
     case 'flat':
@@ -62,7 +96,9 @@ const correlateOptions = (fromOption, forOption) => {
   forOption.selectedIndex = fromOption.selectedIndex;
 };
 
-//Валидация полей
+/* Валидация полей
+   ========================================================================== */
+
 const showMessageError = (quantityRooms, quantityGuests, selectMessageError) => {
 
   if (quantityRooms === '1' && quantityGuests !== '1') {
@@ -112,15 +148,68 @@ const checkInput = (input) => {
   });
 };
 
+/* Фильтрация объявлений
+   ========================================================================== */
+
+const getCheckedCheckBoxes = (parentFeatures) => {
+  const activeFeatures = parentFeatures.querySelectorAll('input:checked');
+  return Array.from(activeFeatures).map((cb) => cb.value);
+}
+
+const compareCheckedValue = (checkedValues, adFeatures) => {
+
+  if (checkedValues.length === 0) {
+    return true;
+  }
+
+  let result = true;
+  checkedValues.forEach((element) => {
+
+    if(!adFeatures.includes(element)) {
+      result = false;
+    }
+  });
+
+  return result;
+};
+
+
+/* Устраняем дребезг
+   ========================================================================== */
+
+const debounce = (cb, timeout) => {
+  let isCooldown = false;
+
+  return () => {
+
+    if (isCooldown) return;
+
+    cb();
+
+    isCooldown = true;
+
+    setTimeout(
+      () => isCooldown = false,
+
+      timeout,
+    );
+  };
+};
+
 export {
   disableElements,
   enableElements,
   isClickEvent,
   isEscEvent,
+  hideElement,
+  addInnerElements,
   compareTypes,
   setMinPrice,
   correlateOptions,
   showMessageError,
   checkSelect,
-  checkInput
+  checkInput,
+  getCheckedCheckBoxes,
+  compareCheckedValue,
+  debounce
 };

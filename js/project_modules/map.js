@@ -2,15 +2,15 @@ import { getData } from './api.js';
 
 import {
   disableElements,
-  enableElements
+  enableElements,
+  debounce
 } from './util.js';
 
 import {
   deactivatingFormFilter,
   activatingFormFilter,
-  compare,
-  renderAdClickType,
-  renderAdClickPrice
+  compareAdAndFilter,
+  addHandlerChange
 } from './form-filter.js';
 
 import {
@@ -23,6 +23,10 @@ import { showAlert } from './notification.js';
 import { createPopup } from './popup.js';
 
 /* global L:readonly */
+
+/* Переменные
+   ========================================================================== */
+
 const AD_QUANTITY = 10;
 const [TOKYO_LAT, TOKYO_LNG] = [35.6895, 139.692];
 const TOKYO_ZOOM = 10;
@@ -37,8 +41,16 @@ const ICON_URL = '../img/pin.svg';
 const ICON_SIZES = [25, 41];
 const ANCHOR_SIZES = [12.5, 41];
 
-//ФУНКЦИИ
-//создает главный маркер
+const RERENDER_DELAY = 500;
+
+
+/* Функции
+   ========================================================================== */
+
+/**
+ * Создает главный маркер
+ */
+
 const mainIcon = L.icon({
   iconUrl: MAIN_ICON_URL,
   iconSize: MAIN_ICON_SIZES,
@@ -56,7 +68,10 @@ const mainMarker = L.marker(
   },
 );
 
-//создает маркеры с балунами
+/**
+ * Создает маркеры и балуны похожих объявлений
+ */
+
 let groupMarkers;
 
 const createMarkersAds = (ads) => {
@@ -64,7 +79,7 @@ const createMarkersAds = (ads) => {
 
   ads.forEach((ad) => {
 
-    if (compare(ad)) {
+    if (compareAdAndFilter(ad)) {
       const markerIcon = L.icon({
         iconUrl: ICON_URL,
         iconSize: ICON_SIZES,
@@ -93,14 +108,19 @@ const createMarkersAds = (ads) => {
   groupMarkers = L.featureGroup(markers.slice(0, AD_QUANTITY)).addTo(map);
 };
 
-//возвращает главную метку в дефолтную позицию
+/**
+ * возвращает главную метку в дефолтную позицию
+ */
+
 const rollBackMap = () => {
   map.setView([TOKYO_LAT, TOKYO_LNG]);
   mainMarker.setLatLng([MAIN_MARKER_LAT, MAIN_MARKER_LNG]);
 };
 
 
-//ДЕАКТИВАЦИЯ ФИЛЬТРА КАРТЫ И ФОРМЫ ЗАПОЛНЕНИЯ ОБЪЯВЛЕНИЯ
+/* Деактивация фильтра карты и формы заполнения объявления
+   ========================================================================== */
+
 deactivatingFormFilter(
   (parent, children) => {
     disableElements(parent, children);
@@ -114,13 +134,23 @@ deactivatingFormAd(
 );
 
 
-//ИНИЦИЛИЗАЦИЯ КАРТЫ, ФИЛЬТРА КАРТЫ И ФОРМЫ ЗАПОЛНЕНИЯ ОБЪЯВЛЕНИЯ
+/* Иницилизация карты, фильтра карты и формы заполнения объявления
+   ========================================================================== */
+
+/**
+ * Иницилизируем карту
+ */
+
 const map = L.map('map-canvas')
   .setView({
     lat: TOKYO_LAT,
     lng: TOKYO_LNG,
 
   }, TOKYO_ZOOM);
+
+/**
+ * Загружаем слои, отрисовываем метки, активируем формы
+ */
 
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -135,8 +165,14 @@ L.tileLayer(
       (ads) => {
         //создание меток похожих объявлений
         createMarkersAds(ads);
-        renderAdClickType(() => createMarkersAds(ads));
-        renderAdClickPrice(() => createMarkersAds(ads));
+        //обработчики изменений фильтра
+        addHandlerChange(
+          debounce(
+            () => createMarkersAds(ads),
+            
+            RERENDER_DELAY,
+          ),
+        );
         //активация фильтра карты
         activatingFormFilter(
           (parent, children) => {
@@ -156,7 +192,9 @@ L.tileLayer(
   });
 
 
-//ПЕРЕДАЕМ В ПОЛЕ АДРЕС КООРДИНАТЫ МЕТКИ
+/* Передаем в поле адрес координаты метки
+   ========================================================================== */
+
 getAddress(mainMarker);
 mainMarker.on('move', (evt) => getAddress(evt.target));
 
