@@ -16,13 +16,16 @@ import {
 import {
   deactivatingFormAd,
   activatingFormAd,
-  getAddress
+  getAddress,
+  passRollBackMap,
+  passСreateMarkersAds
 } from './form-ad.js';
 
 import { showAlert } from './notification.js';
 import { createPopup } from './popup.js';
 
 /* global L:readonly */
+
 
 /* Переменные
    ========================================================================== */
@@ -78,7 +81,7 @@ const createMarkersAds = (ads) => {
   const markers = [];
 
   ads.forEach((ad) => {
-    
+
     if (compareAdAndFilter(ad)) {
       const markerIcon = L.icon({
         iconUrl: ICON_URL,
@@ -116,6 +119,8 @@ const rollBackMap = () => {
   map.setView([TOKYO_LAT, TOKYO_LNG]);
   mainMarker.setLatLng([MAIN_MARKER_LAT, MAIN_MARKER_LNG]);
 };
+
+passRollBackMap(() => rollBackMap());
 
 
 /* Деактивация фильтра карты и формы заполнения объявления
@@ -163,9 +168,11 @@ L.tileLayer(
 
     getData(
       (ads) => {
+
         //создание меток похожих объявлений
         createMarkersAds(ads);
-        //обработчики изменений фильтра
+
+        //обработчик изменений фильтра
         addHandlerChange(
           debounce(
             () => createMarkersAds(ads),
@@ -173,12 +180,16 @@ L.tileLayer(
             RERENDER_DELAY,
           ),
         );
+
         //активация фильтра карты
         activatingFormFilter(
           (parent, children) => {
             enableElements(parent, children);
           },
         );
+
+        //передаем ф-цию createMarkersAds в form-ad.js для сброса меток
+        passСreateMarkersAds(() => createMarkersAds(ads));
       },
 
       () => showAlert('Не удалось загрузить похожие объявления!'),
@@ -196,6 +207,8 @@ L.tileLayer(
    ========================================================================== */
 
 getAddress(mainMarker);
+
+//отслеживаем изменение положения главного маркера
 mainMarker.on('move', (evt) => getAddress(evt.target));
 
 export { rollBackMap };
