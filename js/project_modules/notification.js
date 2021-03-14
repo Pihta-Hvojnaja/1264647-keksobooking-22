@@ -1,4 +1,10 @@
-import { isClickEvent, isEscEvent } from './util.js';
+import {
+  isClickEvent,
+  isEscEvent
+} from './util.js';
+
+/* Переменные
+   ========================================================================== */
 
 const ALERT_SHOW_TIME = 5000;
 const alertPlace = document.querySelector('.map__canvas');
@@ -11,7 +17,14 @@ const noticeFail = noticeFailTemplate.cloneNode(true);
 const noticeLuckTemplate = document.querySelector('#success').content.querySelector('.success');
 const noticeLuck = noticeLuckTemplate.cloneNode(true);
 
-//Ошибка запроса данных
+
+/* Функции
+   ========================================================================== */
+
+/**
+ * Ошибка запроса данных
+ */
+
 const showAlert = (message) => {
   const messageContainer = document.createElement('div');
   messageContainer.style.position = 'absolute';
@@ -37,7 +50,10 @@ const showAlert = (message) => {
   );
 };
 
-//Сообщение об отправке или неотправке данных
+/**
+ * Сообщение об отправке или неотправке данных
+ */
+
 const showNotice = (fail) => {
   let notice;
 
