@@ -156,7 +156,7 @@ const checkInput = (input) => {
   });
 };
 
-const rollbackStyle = (element) => element.style.boxShadow = null;
+const rollBackStyle = (element) => element.style.boxShadow = null;
 
 /* Фильтрация объявлений
    ========================================================================== */
@@ -301,7 +301,7 @@ export {
   validateSelector,
   switchMessageError,
   checkInput,
-  rollbackStyle,
+  rollBackStyle,
   filterType,
   filterPrice,
   filterRoomsGuests,

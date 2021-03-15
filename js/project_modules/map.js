@@ -14,11 +14,13 @@ import {
 } from './form-filter.js';
 
 import {
+  passRollBackMap,
+  passСreateMarkersAds,
   deactivatingFormAd,
   activatingFormAd,
-  getAddress,
-  passRollBackMap,
-  passСreateMarkersAds
+  blockAddressInput,
+  getAddress
+
 } from './form-ad.js';
 
 import { showAlert } from './notification.js';
@@ -120,6 +122,7 @@ const rollBackMap = () => {
   mainMarker.setLatLng([MAIN_MARKER_LAT, MAIN_MARKER_LNG]);
 };
 
+//отдаем ф-цию rollBackMap в form-ad.js
 passRollBackMap(() => rollBackMap());
 
 
@@ -164,7 +167,16 @@ L.tileLayer(
   },
 ).addTo(map)
   .on('load', () => {
+    activatingFormAd(
+      (parent, children) => {
+        enableElements(parent, children);
+      },
+    );
+  })
+  .on('tileload', () => {
     mainMarker.addTo(map);
+    //блокируем поле адрес для редактирования
+    blockAddressInput();
 
     getData(
       (ads) => {
@@ -193,12 +205,6 @@ L.tileLayer(
       },
 
       () => showAlert('Не удалось загрузить похожие объявления!'),
-    );
-
-    activatingFormAd(
-      (parent, children) => {
-        enableElements(parent, children);
-      },
     );
   });
 
