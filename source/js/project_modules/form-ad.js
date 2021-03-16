@@ -2,14 +2,15 @@ import {
   setMinPrice,
   correlateOptions,
   validateSelector,
-  showMessageError,
+  switchMessageError,
   checkInput,
-  rollbackStyle
+  rollBackStyle
 } from './util.js';
 
 import { sendData } from './api.js';
 import { showNotice } from './notification.js';
 import { resetFormFilter } from './form-filter.js';
+import { resetPreview } from './preview.js';
 
 
 /* Переменные
@@ -32,8 +33,6 @@ const selectTimeoutAd = formAd.querySelector('#timeout');
 const selectRoomAd = formAd.querySelector('#room_number');
 const selectCapacityAd = formAd.querySelector('#capacity');
 
-let rollBackMap;
-
 
 /* Функции
    ========================================================================== */
@@ -51,7 +50,16 @@ const activatingFormAd = (cb) => {
 };
 
 /**
- * Получение адреса для поля "адрес"
+ * Блокируем адресную строку для редактирования
+ */
+
+const blockAddressInput = () => {
+  addressAd.readOnly = true;
+};
+
+
+/**
+ * Получение адреса для поля "адрес" из map.js
  */
 
 const getAddress = (marker) => {
@@ -60,39 +68,57 @@ const getAddress = (marker) => {
 };
 
 /**
- * Ф-ции отправки, сброса формы объявления и фильтра карты
+ * Получаем ф-ции rollBackMap, createMarkersAds из map.js
  */
 
 //получаем ф-цию rollBackMap из map.js для отката карты и маркера
-const passRollBackMap = (passedFunction) => {
-  rollBackMap = passedFunction;
+let rollBackMap;
+const passRollBackMap = (cb) => {
+  rollBackMap = cb;
 };
 
-const resetFormsAndMap = () => {
-  resetFormFilter();
-  formAd.reset();
-  rollBackMap();
-
-  rollbackStyle(inputTitleAd);
-  rollbackStyle(inputPriceAd);
-  rollbackStyle(selectRoomAd);
-  rollbackStyle(selectCapacityAd);
+//получаем ф-цию сreateMarkersAds из map.js для отката маркеров
+let createMarkersAds;
+const passCreateMarkersAds = (cb) => {
+  createMarkersAds = cb;
 }
 
+/**
+ * Ф-ции отправки, сброса формы объявления и фильтра карты
+ */
+
+//ф-ция отката форм и карты к дефолту
+const resetFormsAndMap = () => {
+  resetFormFilter(); //откат фильтра
+  formAd.reset(); //откат формы
+
+  if (rollBackMap) {
+    rollBackMap(); //откат карты и главного маркера
+  }
+
+  if (createMarkersAds) {
+    createMarkersAds(); //откат маркеров похожих объявлений
+  }
+  
+  resetPreview(); //сброс превью
+
+  //откат стилей валидируемых полей
+  rollBackStyle(inputTitleAd); //поле "заголовок"
+  rollBackStyle(inputPriceAd); //поле "цена"
+  rollBackStyle(selectRoomAd); //поле "комнаты"
+  rollBackStyle(selectCapacityAd); //поле "гости"
+}
+
+//ф-ция успешной отправки данных
 const onFormSend = () => {
   showNotice();
   resetFormsAndMap();
 };
 
+//ф-ция при провале отправки
 const onFail = () => {
   showNotice('fail');
 };
-
-
-/* Блокируем адресную строку для редактирования
-   ========================================================================== */
-
-addressAd.readOnly = true;
 
 
 /* Отпрака и сброс формы
@@ -132,6 +158,25 @@ formAdReset.addEventListener('click', (evt) => {
 checkInput(inputTitleAd);
 
 /**
+ * Валидация поля "адрес"
+ */
+
+if (addressAd.readOnly === false) {
+  addressAd.addEventListener('input', () => {
+    addressAd.setCustomValidity('');
+    addressAd.reportValidity();
+
+    if (addressAd.validity.valid) {
+      addressAd.style.boxShadow = '0 0 1px 0 #008000';
+
+    } else {
+      addressAd.setCustomValidity('Введите координаты в формате: 00.00000, 000.00000');
+      addressAd.style.boxShadow = null;
+    }
+  });
+}
+
+/**
  * Поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»
  */
 
@@ -167,7 +212,7 @@ selectRoomAd.addEventListener('change', () => {
   selectRoomAd.style.boxShadow = 'none';
 
   const selectStatus = validateSelector(selectRoomAd.value, selectCapacityAd.value, selectCapacityAd)
-  showMessageError(selectStatus, selectCapacityAd, selectRoomAd);
+  switchMessageError(selectStatus, selectCapacityAd, selectRoomAd);
 });
 
 //гости
@@ -176,12 +221,14 @@ selectCapacityAd.addEventListener('change', () => {
   selectCapacityAd.style.boxShadow = 'none';
 
   const selectStatus = validateSelector(selectRoomAd.value, selectCapacityAd.value, selectRoomAd)
-  showMessageError(selectStatus, selectRoomAd, selectCapacityAd);
+  switchMessageError(selectStatus, selectRoomAd, selectCapacityAd);
 });
 
 export {
   passRollBackMap,
+  passCreateMarkersAds,
   activatingFormAd,
   deactivatingFormAd,
+  blockAddressInput,
   getAddress
 };

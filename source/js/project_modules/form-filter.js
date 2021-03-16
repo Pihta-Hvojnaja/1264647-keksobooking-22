@@ -57,21 +57,31 @@ const addHandlerChange = (cb) => {
 const compareAdAndFilter = (ad) => {
 
   //фильтрация "тип жилья"
-  if (!filterType(typeFilter.value, ad.offer.type)) return false;
+  if (!filterType(typeFilter.value, ad.offer.type)) {
+    return false;
+  }
 
   //фильтрация "цена"
-  if (!filterPrice(priceFilter.value, ad.offer.price)) return false;
+  if (!filterPrice(priceFilter.value, ad.offer.price)) {
+    return false;
+  }
 
   //фильтрация "кол-во комнат"
-  if (!filterRoomsGuests(roomsFilter.value, ad.offer.rooms)) return false;
+  if (!filterRoomsGuests(roomsFilter.value, ad.offer.rooms)) {
+    return false;
+  }
 
   //фильтрация "кол-во гостей"
-  if (!filterRoomsGuests(guestsFilter.value, ad.offer.guests)) return false;
+  if (!filterRoomsGuests(guestsFilter.value, ad.offer.guests)) {
+    return false;
+  }
 
   //фильтрация "особенности"
   const resultCompare = compareCheckedValue(getCheckedValue(featuresFilter), ad.offer.features);
 
-  if (resultCompare === false) return false;
+  if (resultCompare === false) {
+    return false;
+  }
 
   return true;
 };

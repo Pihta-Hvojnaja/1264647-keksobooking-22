@@ -1,4 +1,10 @@
 
+/* Переменные
+   ========================================================================== */
+
+const TEMPLATE_IMG_TYPE = /png|jpeg?/i;
+
+
 /* Вкл - Выкл элементов
    ========================================================================== */
 
@@ -121,9 +127,9 @@ const validateSelector = (quantityRooms, quantityGuests, selectMessageError) => 
   }
 };
 
-const showMessageError = (selectStatus, selectMessageError, selectFocus) => {
+const switchMessageError = (validityStatus, selectMessageError, selectFocus) => {
 
-  if (selectStatus) {
+  if (validityStatus) {
     selectMessageError.setCustomValidity('');
     selectFocus.setCustomValidity('');
 
@@ -150,7 +156,7 @@ const checkInput = (input) => {
   });
 };
 
-const rollbackStyle = (element) => element.style.boxShadow = null;
+const rollBackStyle = (element) => element.style.boxShadow = null;
 
 /* Фильтрация объявлений
    ========================================================================== */
@@ -216,6 +222,49 @@ const compareCheckedValue = (checkedValues, adFeatures) => {
 };
 
 
+/* Валидация превью
+   ========================================================================== */
+
+const checkFileChooser = (fileType, input, delay) => {
+
+  if (TEMPLATE_IMG_TYPE.test(fileType)) {
+    input.setCustomValidity('');
+    return true;
+
+  } else {
+    input.setCustomValidity('Пожалуйста, загрузите изображение формата png или jpeg!');
+    input.reportValidity();
+
+    setTimeout(
+      () => input.setCustomValidity(''),
+      delay,
+    );
+
+    return false;
+  }
+};
+
+const showPreview = (elementInput, elementImg, delay) => {
+  const file = elementInput.files[0];
+  const fileType = file.type;
+
+  if(checkFileChooser(fileType, elementInput, delay)) {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () => {
+      elementImg.src = reader.result;
+    });
+
+    reader.readAsDataURL(file);
+
+    return true;
+
+  } else {
+    return false;
+  }
+};
+
+
 /* Устранение дребезга
    ========================================================================== */
 
@@ -224,7 +273,9 @@ const debounce = (cb, timeout) => {
 
   return () => {
 
-    if (isCooldown) return;
+    if (isCooldown) {
+      return;
+    }
 
     cb();
 
@@ -238,6 +289,7 @@ const debounce = (cb, timeout) => {
   };
 };
 
+
 export {
   disableElements,
   enableElements,
@@ -249,13 +301,14 @@ export {
   setMinPrice,
   correlateOptions,
   validateSelector,
-  showMessageError,
+  switchMessageError,
   checkInput,
-  rollbackStyle,
+  rollBackStyle,
   filterType,
   filterPrice,
   filterRoomsGuests,
   getCheckedValue,
   compareCheckedValue,
+  showPreview,
   debounce
 };

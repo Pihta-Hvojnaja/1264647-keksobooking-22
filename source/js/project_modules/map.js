@@ -1,3 +1,6 @@
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
 import { getData } from './api.js';
 
 import {
@@ -14,15 +17,18 @@ import {
 } from './form-filter.js';
 
 import {
+  passRollBackMap,
+  passCreateMarkersAds,
   deactivatingFormAd,
   activatingFormAd,
+  blockAddressInput,
   getAddress
+
 } from './form-ad.js';
 
 import { showAlert } from './notification.js';
 import { createPopup } from './popup.js';
 
-/* global L:readonly */
 
 /* Переменные
    ========================================================================== */
@@ -48,27 +54,6 @@ const RERENDER_DELAY = 500;
    ========================================================================== */
 
 /**
- * Создает главный маркер
- */
-
-const mainIcon = L.icon({
-  iconUrl: MAIN_ICON_URL,
-  iconSize: MAIN_ICON_SIZES,
-  iconAnchor: MAIN_ANCHOR_SIZES,
-});
-
-const mainMarker = L.marker(
-  {
-    lat: MAIN_MARKER_LAT,
-    lng: MAIN_MARKER_LNG,
-  },
-  {
-    draggable: true,
-    icon: mainIcon,
-  },
-);
-
-/**
  * Создает маркеры и балуны похожих объявлений
  */
 
@@ -78,7 +63,7 @@ const createMarkersAds = (ads) => {
   const markers = [];
 
   ads.forEach((ad) => {
-    
+
     if (compareAdAndFilter(ad)) {
       const markerIcon = L.icon({
         iconUrl: ICON_URL,
@@ -106,6 +91,7 @@ const createMarkersAds = (ads) => {
   }
 
   groupMarkers = L.featureGroup(markers.slice(0, AD_QUANTITY)).addTo(map);
+
 };
 
 /**
@@ -115,6 +101,43 @@ const createMarkersAds = (ads) => {
 const rollBackMap = () => {
   map.setView([TOKYO_LAT, TOKYO_LNG]);
   mainMarker.setLatLng([MAIN_MARKER_LAT, MAIN_MARKER_LNG]);
+};
+
+/**
+ * Отрисовывает метки похожих объявлений, активирует формы
+ */
+
+const activateMarkersAndAd = () => {
+  mainMarker.addTo(map);
+
+  getData(
+    (ads) => {
+      //создание меток похожих объявлений
+      createMarkersAds(ads);
+      //обработчик изменений фильтра
+      addHandlerChange(
+        debounce(
+          () => createMarkersAds(ads),
+
+          RERENDER_DELAY,
+        ),
+      );
+      //активация фильтра карты
+      activatingFormFilter(
+        (parent, children) => {
+          enableElements(parent, children);
+        },
+      );
+      //передаем ф-цию createMarkersAds в form-ad.js для сброса меток
+      passCreateMarkersAds(() => createMarkersAds(ads));
+    },
+
+    () => showAlert('Не удалось загрузить похожие объявления!'),
+  );
+  //блокируем поле адрес для редактирования
+  blockAddressInput();
+  //отдаем ф-цию rollBackMap в form-ad.js
+  passRollBackMap(() => rollBackMap());
 };
 
 
@@ -134,11 +157,36 @@ deactivatingFormAd(
 );
 
 
-/* Иницилизация карты, фильтра карты и формы заполнения объявления
+/* Иницилизация карты (с метками),
+ * фильтра карты
+ * и формы заполнения объявления
    ========================================================================== */
 
 /**
- * Иницилизируем карту
+ * Создаем главный маркер
+ */
+
+const mainIcon = L.icon({
+  iconUrl: MAIN_ICON_URL,
+  iconSize: MAIN_ICON_SIZES,
+  iconAnchor: MAIN_ANCHOR_SIZES,
+});
+
+const mainMarker = L.marker(
+  {
+    lat: MAIN_MARKER_LAT,
+    lng: MAIN_MARKER_LNG,
+  },
+  {
+    draggable: true,
+    icon: mainIcon,
+  },
+);
+
+/**
+ * Иницилизируем карту, фильтр,
+ * добавляем метки похожих объявлений,
+ * блокируем поле адрес для редактирования
  */
 
 const map = L.map('map-canvas')
@@ -148,54 +196,31 @@ const map = L.map('map-canvas')
 
   }, TOKYO_ZOOM);
 
-/**
- * Загружаем слои, отрисовываем метки, активируем формы
- */
-
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   },
 ).addTo(map)
-  .on('load', () => {
-    mainMarker.addTo(map);
+  .once('tileload', activateMarkersAndAd);
 
-    getData(
-      (ads) => {
-        //создание меток похожих объявлений
-        createMarkersAds(ads);
-        //обработчики изменений фильтра
-        addHandlerChange(
-          debounce(
-            () => createMarkersAds(ads),
+/**
+ * Активируем форму создания объявления
+ */
 
-            RERENDER_DELAY,
-          ),
-        );
-        //активация фильтра карты
-        activatingFormFilter(
-          (parent, children) => {
-            enableElements(parent, children);
-          },
-        );
-      },
-
-      () => showAlert('Не удалось загрузить похожие объявления!'),
-    );
-
-    activatingFormAd(
-      (parent, children) => {
-        enableElements(parent, children);
-      },
-    );
-  });
+activatingFormAd(
+  (parent, children) => {
+    enableElements(parent, children);
+  },
+);
 
 
 /* Передаем в поле адрес координаты метки
    ========================================================================== */
 
 getAddress(mainMarker);
+
+//отслеживаем изменение положения главного маркера
 mainMarker.on('move', (evt) => getAddress(evt.target));
 
 export { rollBackMap };
