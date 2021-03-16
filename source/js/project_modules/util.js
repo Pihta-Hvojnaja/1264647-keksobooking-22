@@ -273,7 +273,9 @@ const debounce = (cb, timeout) => {
 
   return () => {
 
-    if (isCooldown) return;
+    if (isCooldown) {
+      return;
+    }
 
     cb();
 

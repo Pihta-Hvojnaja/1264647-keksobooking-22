@@ -79,7 +79,7 @@ const passRollBackMap = (cb) => {
 
 //получаем ф-цию сreateMarkersAds из map.js для отката маркеров
 let createMarkersAds;
-const passСreateMarkersAds = (cb) => {
+const passCreateMarkersAds = (cb) => {
   createMarkersAds = cb;
 }
 
@@ -91,8 +91,15 @@ const passСreateMarkersAds = (cb) => {
 const resetFormsAndMap = () => {
   resetFormFilter(); //откат фильтра
   formAd.reset(); //откат формы
-  if (rollBackMap) rollBackMap(); //откат карты и главного маркера
-  if (createMarkersAds) createMarkersAds(); //откат маркеров похожих объявлений
+
+  if (rollBackMap) {
+    rollBackMap(); //откат карты и главного маркера
+  }
+
+  if (createMarkersAds) {
+    createMarkersAds(); //откат маркеров похожих объявлений
+  }
+  
   resetPreview(); //сброс превью
 
   //откат стилей валидируемых полей
@@ -219,7 +226,7 @@ selectCapacityAd.addEventListener('change', () => {
 
 export {
   passRollBackMap,
-  passСreateMarkersAds,
+  passCreateMarkersAds,
   activatingFormAd,
   deactivatingFormAd,
   blockAddressInput,

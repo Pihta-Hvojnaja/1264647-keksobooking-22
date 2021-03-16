@@ -18,7 +18,7 @@ import {
 
 import {
   passRollBackMap,
-  passСreateMarkersAds,
+  passCreateMarkersAds,
   deactivatingFormAd,
   activatingFormAd,
   blockAddressInput,
@@ -95,12 +95,21 @@ const createMarkersAds = (ads) => {
 };
 
 /**
+ * возвращает главную метку в дефолтную позицию
+ */
+
+ const rollBackMap = () => {
+  map.setView([TOKYO_LAT, TOKYO_LNG]);
+  mainMarker.setLatLng([MAIN_MARKER_LAT, MAIN_MARKER_LNG]);
+};
+
+/**
  * Отрисовывает метки похожих объявлений, активирует формы
  */
 
 const activateMarkersAndAd = () => {
   mainMarker.addTo(map);
-  
+
   getData(
     (ads) => {
       //создание меток похожих объявлений
@@ -120,26 +129,16 @@ const activateMarkersAndAd = () => {
         },
       );
       //передаем ф-цию createMarkersAds в form-ad.js для сброса меток
-      passСreateMarkersAds(() => createMarkersAds(ads));
+      passCreateMarkersAds(() => createMarkersAds(ads));
     },
 
     () => showAlert('Не удалось загрузить похожие объявления!'),
   );
   //блокируем поле адрес для редактирования
   blockAddressInput();
+  //отдаем ф-цию rollBackMap в form-ad.js
+  passRollBackMap(() => rollBackMap());
 };
-
-/**
- * возвращает главную метку в дефолтную позицию
- */
-
-const rollBackMap = () => {
-  map.setView([TOKYO_LAT, TOKYO_LNG]);
-  mainMarker.setLatLng([MAIN_MARKER_LAT, MAIN_MARKER_LNG]);
-};
-
-//отдаем ф-цию rollBackMap в form-ad.js
-passRollBackMap(() => rollBackMap());
 
 
 /* Деактивация фильтра карты и формы заполнения объявления
@@ -205,8 +204,10 @@ L.tileLayer(
 ).addTo(map)
   .once('tileload', activateMarkersAndAd);
 
+/**
+ * Активируем форму создания объявления
+ */
 
-//активируем форму создания объявления
 activatingFormAd(
   (parent, children) => {
     enableElements(parent, children);
