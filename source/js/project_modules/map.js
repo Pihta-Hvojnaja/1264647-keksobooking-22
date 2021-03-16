@@ -98,7 +98,7 @@ const createMarkersAds = (ads) => {
  * возвращает главную метку в дефолтную позицию
  */
 
- const rollBackMap = () => {
+const rollBackMap = () => {
   map.setView([TOKYO_LAT, TOKYO_LNG]);
   mainMarker.setLatLng([MAIN_MARKER_LAT, MAIN_MARKER_LNG]);
 };
