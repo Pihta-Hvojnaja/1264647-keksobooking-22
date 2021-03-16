@@ -1,3 +1,6 @@
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
 import { getData } from './api.js';
 
 import {
@@ -26,8 +29,6 @@ import {
 import { showAlert } from './notification.js';
 import { createPopup } from './popup.js';
 
-/* global L:readonly */
-
 
 /* Переменные
    ========================================================================== */
@@ -51,27 +52,6 @@ const RERENDER_DELAY = 500;
 
 /* Функции
    ========================================================================== */
-
-/**
- * Создает главный маркер
- */
-
-const mainIcon = L.icon({
-  iconUrl: MAIN_ICON_URL,
-  iconSize: MAIN_ICON_SIZES,
-  iconAnchor: MAIN_ANCHOR_SIZES,
-});
-
-const mainMarker = L.marker(
-  {
-    lat: MAIN_MARKER_LAT,
-    lng: MAIN_MARKER_LNG,
-  },
-  {
-    draggable: true,
-    icon: mainIcon,
-  },
-);
 
 /**
  * Создает маркеры и балуны похожих объявлений
@@ -111,6 +91,42 @@ const createMarkersAds = (ads) => {
   }
 
   groupMarkers = L.featureGroup(markers.slice(0, AD_QUANTITY)).addTo(map);
+
+};
+
+/**
+ * Отрисовывает метки похожих объявлений, активирует формы
+ */
+
+const activateMarkersAndAd = () => {
+  mainMarker.addTo(map);
+  
+  getData(
+    (ads) => {
+      //создание меток похожих объявлений
+      createMarkersAds(ads);
+      //обработчик изменений фильтра
+      addHandlerChange(
+        debounce(
+          () => createMarkersAds(ads),
+
+          RERENDER_DELAY,
+        ),
+      );
+      //активация фильтра карты
+      activatingFormFilter(
+        (parent, children) => {
+          enableElements(parent, children);
+        },
+      );
+      //передаем ф-цию createMarkersAds в form-ad.js для сброса меток
+      passСreateMarkersAds(() => createMarkersAds(ads));
+    },
+
+    () => showAlert('Не удалось загрузить похожие объявления!'),
+  );
+  //блокируем поле адрес для редактирования
+  blockAddressInput();
 };
 
 /**
@@ -142,11 +158,36 @@ deactivatingFormAd(
 );
 
 
-/* Иницилизация карты, фильтра карты и формы заполнения объявления
+/* Иницилизация карты (с метками),
+ * фильтра карты
+ * и формы заполнения объявления
    ========================================================================== */
 
 /**
- * Иницилизируем карту
+ * Создаем главный маркер
+ */
+
+const mainIcon = L.icon({
+  iconUrl: MAIN_ICON_URL,
+  iconSize: MAIN_ICON_SIZES,
+  iconAnchor: MAIN_ANCHOR_SIZES,
+});
+
+const mainMarker = L.marker(
+  {
+    lat: MAIN_MARKER_LAT,
+    lng: MAIN_MARKER_LNG,
+  },
+  {
+    draggable: true,
+    icon: mainIcon,
+  },
+);
+
+/**
+ * Иницилизируем карту, фильтр,
+ * добавляем метки похожих объявлений,
+ * блокируем поле адрес для редактирования
  */
 
 const map = L.map('map-canvas')
@@ -156,57 +197,21 @@ const map = L.map('map-canvas')
 
   }, TOKYO_ZOOM);
 
-/**
- * Загружаем слои, отрисовываем метки, активируем формы
- */
-
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   },
 ).addTo(map)
-  .on('load', () => {
-    activatingFormAd(
-      (parent, children) => {
-        enableElements(parent, children);
-      },
-    );
-  })
-  .on('tileload', () => {
-    mainMarker.addTo(map);
-    //блокируем поле адрес для редактирования
-    blockAddressInput();
+  .once('tileload', activateMarkersAndAd);
 
-    getData(
-      (ads) => {
 
-        //создание меток похожих объявлений
-        createMarkersAds(ads);
-
-        //обработчик изменений фильтра
-        addHandlerChange(
-          debounce(
-            () => createMarkersAds(ads),
-
-            RERENDER_DELAY,
-          ),
-        );
-
-        //активация фильтра карты
-        activatingFormFilter(
-          (parent, children) => {
-            enableElements(parent, children);
-          },
-        );
-
-        //передаем ф-цию createMarkersAds в form-ad.js для сброса меток
-        passСreateMarkersAds(() => createMarkersAds(ads));
-      },
-
-      () => showAlert('Не удалось загрузить похожие объявления!'),
-    );
-  });
+//активируем форму создания объявления
+activatingFormAd(
+  (parent, children) => {
+    enableElements(parent, children);
+  },
+);
 
 
 /* Передаем в поле адрес координаты метки
