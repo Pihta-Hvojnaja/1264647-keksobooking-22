@@ -2,7 +2,7 @@ import {
   setMinPrice,
   correlateOptions,
   validateSelector,
-  switchMessageError,
+  showMessageError,
   checkInput,
   rollBackStyle
 } from './util.js';
@@ -16,22 +16,24 @@ import { resetPreview } from './preview.js';
 /* Переменные
    ========================================================================== */
 
-const formAd = document.querySelector('.ad-form');
-const formAdElements = formAd.querySelectorAll('.ad-form-header, .ad-form__element');
+const MESSAGE_ERROR_FORMAT_ADDRESS = 'Введите координаты в формате: 00.00000, 000.00000';
 
-const formAdReset = formAd.querySelector('.ad-form__reset');
+const formAdElement = document.querySelector('.ad-form');
+const formAdElements = formAdElement.querySelectorAll('.ad-form-header, .ad-form__element');
 
-const inputTitleAd = formAd.querySelector('#title');
-const addressAd = formAd.querySelector('#address');
+const resetElement = formAdElement.querySelector('.ad-form__reset');
 
-const selectTypeAd = formAd.querySelector('#type');
-const inputPriceAd = formAd.querySelector('#price');
+const titleElement = formAdElement.querySelector('#title');
+const addressElement = formAdElement.querySelector('#address');
 
-const selectTimeinAd = formAd.querySelector('#timein');
-const selectTimeoutAd = formAd.querySelector('#timeout');
+const typeElement = formAdElement.querySelector('#type');
+const priceElement = formAdElement.querySelector('#price');
 
-const selectRoomAd = formAd.querySelector('#room_number');
-const selectCapacityAd = formAd.querySelector('#capacity');
+const timeElement = formAdElement.querySelector('#timein');
+const timeoutElement = formAdElement.querySelector('#timeout');
+
+const roomsElement = formAdElement.querySelector('#room_number');
+const guestsElement = formAdElement.querySelector('#capacity');
 
 
 /* Функции
@@ -41,22 +43,15 @@ const selectCapacityAd = formAd.querySelector('#capacity');
  * Деактивация-активация формы объявления
  */
 
-const deactivatingFormAd = (cb) => {
-  cb(formAd, formAdElements);
-};
+const deactivateFormAd = (cb) => cb(formAdElement, formAdElements);
 
-const activatingFormAd = (cb) => {
-  cb(formAd, formAdElements);
-};
+const activateFormAd = (cb) => cb(formAdElement, formAdElements);
 
 /**
  * Блокируем адресную строку для редактирования
  */
 
-const blockAddressInput = () => {
-  addressAd.readOnly = true;
-};
-
+const blockAddressInput = () => addressElement.readOnly = true;
 
 /**
  * Получение адреса для поля "адрес" из map.js
@@ -64,7 +59,7 @@ const blockAddressInput = () => {
 
 const getAddress = (marker) => {
   const source = marker.getLatLng();
-  addressAd.value = (source.lat).toFixed(5) + ', '+ (source.lng).toFixed(5);
+  addressElement.value = (source.lat).toFixed(5) + ', '+ (source.lng).toFixed(5);
 };
 
 /**
@@ -73,15 +68,11 @@ const getAddress = (marker) => {
 
 //получаем ф-цию rollBackMap из map.js для отката карты и маркера
 let rollBackMap;
-const passRollBackMap = (cb) => {
-  rollBackMap = cb;
-};
+const passRollBackMap = (cb) => rollBackMap = cb;
 
 //получаем ф-цию сreateMarkersAds из map.js для отката маркеров
 let createMarkersAds;
-const passCreateMarkersAds = (cb) => {
-  createMarkersAds = cb;
-}
+const passCreateMarkersAds = (cb) => createMarkersAds = cb;
 
 /**
  * Ф-ции отправки, сброса формы объявления и фильтра карты
@@ -90,7 +81,7 @@ const passCreateMarkersAds = (cb) => {
 //ф-ция отката форм и карты к дефолту
 const resetFormsAndMap = () => {
   resetFormFilter(); //откат фильтра
-  formAd.reset(); //откат формы
+  formAdElement.reset(); //откат формы
 
   if (rollBackMap) {
     rollBackMap(); //откат карты и главного маркера
@@ -99,14 +90,14 @@ const resetFormsAndMap = () => {
   if (createMarkersAds) {
     createMarkersAds(); //откат маркеров похожих объявлений
   }
-  
+
   resetPreview(); //сброс превью
 
   //откат стилей валидируемых полей
-  rollBackStyle(inputTitleAd); //поле "заголовок"
-  rollBackStyle(inputPriceAd); //поле "цена"
-  rollBackStyle(selectRoomAd); //поле "комнаты"
-  rollBackStyle(selectCapacityAd); //поле "гости"
+  rollBackStyle(titleElement); //поле "заголовок"
+  rollBackStyle(priceElement); //поле "цена"
+  rollBackStyle(roomsElement); //поле "комнаты"
+  rollBackStyle(guestsElement); //поле "гости"
 }
 
 //ф-ция успешной отправки данных
@@ -116,9 +107,7 @@ const onFormSend = () => {
 };
 
 //ф-ция при провале отправки
-const onFail = () => {
-  showNotice('fail');
-};
+const onFail = () => showNotice('fail');
 
 
 /* Отпрака и сброс формы
@@ -128,7 +117,7 @@ const onFail = () => {
  * Отправка данных формы
  */
 
-formAd.addEventListener('submit', (evt) => {
+formAdElement.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
   sendData(
@@ -142,7 +131,7 @@ formAd.addEventListener('submit', (evt) => {
  * Возвращаем карту к изначальному состоянию через reset
  */
 
-formAdReset.addEventListener('click', (evt) => {
+resetElement.addEventListener('click', (evt) => {
   evt.preventDefault();
   resetFormsAndMap();
 });
@@ -155,23 +144,23 @@ formAdReset.addEventListener('click', (evt) => {
  * Валидация заголовка объявления
  */
 
-checkInput(inputTitleAd);
+checkInput(titleElement);
 
 /**
  * Валидация поля "адрес"
  */
 
-if (addressAd.readOnly === false) {
-  addressAd.addEventListener('input', () => {
-    addressAd.setCustomValidity('');
-    addressAd.reportValidity();
+if (addressElement.readOnly === false) {
+  addressElement.addEventListener('input', () => {
+    addressElement.setCustomValidity('');
+    addressElement.reportValidity();
 
-    if (addressAd.validity.valid) {
-      addressAd.style.boxShadow = '0 0 1px 0 #008000';
+    if (addressElement.validity.valid) {
+      addressElement.style.boxShadow = '0 0 1px 0 #008000';
 
     } else {
-      addressAd.setCustomValidity('Введите координаты в формате: 00.00000, 000.00000');
-      addressAd.style.boxShadow = null;
+      addressElement.setCustomValidity(MESSAGE_ERROR_FORMAT_ADDRESS);
+      addressElement.style.boxShadow = null;
     }
   });
 }
@@ -180,26 +169,26 @@ if (addressAd.readOnly === false) {
  * Поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»
  */
 
-setMinPrice(selectTypeAd, inputPriceAd);
+setMinPrice(typeElement, priceElement);
 
-selectTypeAd.addEventListener('change', () => {
-  setMinPrice(selectTypeAd, inputPriceAd);
+typeElement.addEventListener('change', () => {
+  setMinPrice(typeElement, priceElement);
 });
 
-checkInput(inputPriceAd);
+checkInput(priceElement);
 
 /**
  * Синхронизация полей «Время заезда» и «Время выезда»
  */
 
-correlateOptions(selectTimeinAd, selectTimeoutAd);
+correlateOptions(timeElement, timeoutElement);
 
-selectTimeinAd.addEventListener('change', () => {
-  correlateOptions(selectTimeinAd, selectTimeoutAd);
+timeElement.addEventListener('change', () => {
+  correlateOptions(timeElement, timeoutElement);
 });
 
-selectTimeoutAd.addEventListener('change', () => {
-  correlateOptions(selectTimeoutAd, selectTimeinAd);
+timeoutElement.addEventListener('change', () => {
+  correlateOptions(timeoutElement, timeElement);
 });
 
 /**
@@ -207,28 +196,28 @@ selectTimeoutAd.addEventListener('change', () => {
  */
 
 //комнаты
-selectRoomAd.addEventListener('change', () => {
+roomsElement.addEventListener('change', () => {
 
-  selectRoomAd.style.boxShadow = 'none';
+  roomsElement.style.boxShadow = 'none';
 
-  const selectStatus = validateSelector(selectRoomAd.value, selectCapacityAd.value, selectCapacityAd)
-  switchMessageError(selectStatus, selectCapacityAd, selectRoomAd);
+  const selectStatus = validateSelector(roomsElement.value, guestsElement.value, guestsElement)
+  showMessageError(selectStatus, guestsElement, roomsElement);
 });
 
 //гости
-selectCapacityAd.addEventListener('change', () => {
+guestsElement.addEventListener('change', () => {
 
-  selectCapacityAd.style.boxShadow = 'none';
+  guestsElement.style.boxShadow = 'none';
 
-  const selectStatus = validateSelector(selectRoomAd.value, selectCapacityAd.value, selectRoomAd)
-  switchMessageError(selectStatus, selectRoomAd, selectCapacityAd);
+  const selectStatus = validateSelector(roomsElement.value, guestsElement.value, roomsElement)
+  showMessageError(selectStatus, roomsElement, guestsElement);
 });
 
 export {
   passRollBackMap,
   passCreateMarkersAds,
-  activatingFormAd,
-  deactivatingFormAd,
+  activateFormAd,
+  deactivateFormAd,
   blockAddressInput,
   getAddress
 };

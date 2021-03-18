@@ -10,14 +10,14 @@ import {
 /* Переменные
    ========================================================================== */
 
-const formFilter = document.querySelector('.map__filters');
-const formFilterElements = formFilter.querySelectorAll('.map__filter, .map__features');
+const formFilterElement = document.querySelector('.map__filters');
+const formFilterElements = formFilterElement.querySelectorAll('.map__filter, .map__features');
 
-const typeFilter = formFilter.querySelector('#housing-type');
-const priceFilter = formFilter.querySelector('#housing-price');
-const roomsFilter = formFilter.querySelector('#housing-rooms');
-const guestsFilter = formFilter.querySelector('#housing-guests');
-const featuresFilter = formFilter.querySelector('#housing-features');
+const typeElement = formFilterElement.querySelector('#housing-type');
+const priceElement = formFilterElement.querySelector('#housing-price');
+const roomsElement = formFilterElement.querySelector('#housing-rooms');
+const guestsElement = formFilterElement.querySelector('#housing-guests');
+const featuresElement = formFilterElement.querySelector('#housing-features');
 
 /* Функции
    ========================================================================== */
@@ -26,28 +26,22 @@ const featuresFilter = formFilter.querySelector('#housing-features');
  * Деактивация-активация формы фильтра
  */
 
-const deactivatingFormFilter = (cb) => {
-  cb(formFilter, formFilterElements);
-};
+const deactivateFormFilter = (cb) => cb(formFilterElement, formFilterElements);
 
-const activatingFormFilter = (cb) => {
-  cb(formFilter, formFilterElements);
-};
+const activateFormFilter = (cb) => cb(formFilterElement, formFilterElements);
 
 /**
  * Сброс формы фильтра
  */
 
-const resetFormFilter = () => formFilter.reset();
+const resetFormFilter = () => formFilterElement.reset();
 
 /**
  * Ф-ция-обработчик изменений фильтра
  */
 
-const addHandlerChange = (cb) => {
-  formFilter.addEventListener('change', () => {
-    cb();
-  });
+const onFormFilterChange = (cb) => {
+  formFilterElement.addEventListener('change', () => cb());
 };
 
 /**
@@ -57,27 +51,27 @@ const addHandlerChange = (cb) => {
 const compareAdAndFilter = (ad) => {
 
   //фильтрация "тип жилья"
-  if (!filterType(typeFilter.value, ad.offer.type)) {
+  if (!filterType(typeElement.value, ad.offer.type)) {
     return false;
   }
 
   //фильтрация "цена"
-  if (!filterPrice(priceFilter.value, ad.offer.price)) {
+  if (!filterPrice(priceElement.value, ad.offer.price)) {
     return false;
   }
 
   //фильтрация "кол-во комнат"
-  if (!filterRoomsGuests(roomsFilter.value, ad.offer.rooms)) {
+  if (!filterRoomsGuests(roomsElement.value, ad.offer.rooms)) {
     return false;
   }
 
   //фильтрация "кол-во гостей"
-  if (!filterRoomsGuests(guestsFilter.value, ad.offer.guests)) {
+  if (!filterRoomsGuests(guestsElement.value, ad.offer.guests)) {
     return false;
   }
 
   //фильтрация "особенности"
-  const resultCompare = compareCheckedValue(getCheckedValue(featuresFilter), ad.offer.features);
+  const resultCompare = compareCheckedValue(getCheckedValue(featuresElement), ad.offer.features);
 
   if (resultCompare === false) {
     return false;
@@ -88,8 +82,8 @@ const compareAdAndFilter = (ad) => {
 
 export {
   resetFormFilter,
-  deactivatingFormFilter,
-  activatingFormFilter,
+  deactivateFormFilter,
+  activateFormFilter,
   compareAdAndFilter,
-  addHandlerChange
+  onFormFilterChange
 };

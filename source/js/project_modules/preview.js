@@ -9,15 +9,15 @@ const DELAY = 1000;
 const TAG_IMG = '<img src="" width="70" height="70">';
 
 //Поля загрузки для фото аватарки
-const headerAd = document.querySelector('.ad-form-header');
-const fileChooserAvatarAd = headerAd.querySelector('#avatar');
-const previewAvatarAd = headerAd.querySelector('.ad-form-header__preview img');
+const headerAdElement = document.querySelector('.ad-form-header');
+const fileChooserAvatarElement = headerAdElement.querySelector('#avatar');
+const previewAvatarElement = headerAdElement.querySelector('.ad-form-header__preview img');
 
 //Поля загрузки для фото жилых помещений
-const photoContainerAd = document.querySelector('.ad-form__photo-container');
-const fileChooserHousingAd = photoContainerAd.querySelector('#images');
-const previewHousingAd = photoContainerAd.querySelector('.ad-form__photo');
-let photoHousingAd;
+const photoContainerElement = document.querySelector('.ad-form__photo-container');
+const fileChooserHousingElement = photoContainerElement.querySelector('#images');
+const previewContainerElement = photoContainerElement.querySelector('.ad-form__photo');
+let previewHousingElement;
 
 
 /* Функции
@@ -28,10 +28,13 @@ let photoHousingAd;
  */
 
 const resetPreview = () => {
-  previewAvatarAd.src = AVATAR_DEFAULT_URL;
+  previewAvatarElement.src = AVATAR_DEFAULT_URL;
 
-  if (photoHousingAd) previewHousingAd.removeChild(photoHousingAd);
-  photoHousingAd = null;
+  if (previewHousingElement) {
+    previewContainerElement.removeChild(previewHousingElement);
+  }
+
+  previewHousingElement = null;
 };
 
 
@@ -42,9 +45,9 @@ const resetPreview = () => {
  * Превью аватарки
  */
 
-fileChooserAvatarAd.addEventListener('change', () => {
-  if (!showPreview(fileChooserAvatarAd, previewAvatarAd, DELAY)) {
-    previewAvatarAd.src = AVATAR_DEFAULT_URL;
+fileChooserAvatarElement.addEventListener('change', () => {
+  if (!showPreview(fileChooserAvatarElement, previewAvatarElement, DELAY)) {
+    previewAvatarElement.src = AVATAR_DEFAULT_URL;
   }
 });
 
@@ -52,16 +55,16 @@ fileChooserAvatarAd.addEventListener('change', () => {
  * Превью жилых помещений
  */
 
-fileChooserHousingAd.addEventListener('change', () => {
+fileChooserHousingElement.addEventListener('change', () => {
 
-  if (!photoHousingAd) {
-    previewHousingAd.insertAdjacentHTML('beforeend', TAG_IMG);
-    photoHousingAd = photoContainerAd.querySelector('.ad-form__photo img');
+  if (!previewHousingElement) {
+    previewContainerElement.insertAdjacentHTML('beforeend', TAG_IMG);
+    previewHousingElement = photoContainerElement.querySelector('.ad-form__photo img');
   }
 
-  if (!showPreview(fileChooserHousingAd, photoHousingAd, DELAY)) {
-    previewHousingAd.removeChild(photoHousingAd);
-    photoHousingAd = null;
+  if (!showPreview(fileChooserHousingElement, previewHousingElement, DELAY)) {
+    previewContainerElement.removeChild(previewHousingElement);
+    previewHousingElement = null;
   }
 });
 
