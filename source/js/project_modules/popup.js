@@ -10,8 +10,6 @@ import {
 
 const mapPopupTemplateElement = document.querySelector('#card').content.querySelector('.popup');
 
-const mapPopupElement = mapPopupTemplateElement.cloneNode(true);
-
 /* Функции
    ========================================================================== */
 
@@ -20,6 +18,7 @@ const mapPopupElement = mapPopupTemplateElement.cloneNode(true);
  */
 
 const createPopup = (ad) => {
+  const mapPopupElement = mapPopupTemplateElement.cloneNode(true);
 
   //Аватарка
   let element = mapPopupElement.querySelector('.popup__avatar');

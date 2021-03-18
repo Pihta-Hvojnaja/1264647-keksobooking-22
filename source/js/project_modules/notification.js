@@ -6,13 +6,16 @@ import {
    ========================================================================== */
 
 const ALERT_SHOW_TIME = 5000;
-const alertPlaceElement = document.querySelector('.map__canvas');
 
+//места размещения сообщений
+const alertPlaceElement = document.querySelector('.map__canvas');
 const noticePlaseElement = document.querySelector('main');
 
+//сообщение о неудачной отпраке данных
 const noticeFailTemplateElement = document.querySelector('#error').content.querySelector('.error');
 const noticeFailElement = noticeFailTemplateElement.cloneNode(true);
 
+//сообщение об удачной отпраке данных
 const noticeLuckTemplateElement = document.querySelector('#success').content.querySelector('.success');
 const noticeLuckElement = noticeLuckTemplateElement.cloneNode(true);
 

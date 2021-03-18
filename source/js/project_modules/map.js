@@ -34,15 +34,18 @@ import { createPopup } from './popup.js';
    ========================================================================== */
 
 const AD_QUANTITY = 10;
+
+//координаты центра карты, масштаб
 const [TOKYO_LAT, TOKYO_LNG] = [35.6895, 139.692];
 const TOKYO_ZOOM = 10;
 
+//главный маркер
 const MAIN_ICON_URL = '../img/main-pin.svg';
 const MAIN_ICON_SIZES = [50, 82];
 const MAIN_ANCHOR_SIZES = [25, 82];
-
 const [MAIN_MARKER_LAT, MAIN_MARKER_LNG] = [35.6895, 139.692];
 
+//дополнительные маркеры
 const ICON_URL = '../img/pin.svg';
 const ICON_SIZES = [25, 41];
 const ANCHOR_SIZES = [12.5, 41];

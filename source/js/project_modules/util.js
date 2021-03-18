@@ -43,12 +43,14 @@ const enableElements = (parent, children) => {
   }
 };
 
+
 /* Проверка событий
    ========================================================================== */
 
 const isEscEvent = (evt) => {
   return evt.key === ('Escape' || 'Esc');
 };
+
 
 /* Размещение похожих объявлений в балунах
    ========================================================================== */
@@ -76,6 +78,7 @@ const addInnerElements = (parent, items, htmlTag) => {
     parent.insertAdjacentHTML('beforeend', childTag);
   });
 }
+
 
 /* Корреляция значений полей
    ========================================================================== */
@@ -116,6 +119,7 @@ const setMinPrice = (fromSelect, forInput) => {
 const correlateOptions = (fromOption, forOption) => {
   forOption.selectedIndex = fromOption.selectedIndex;
 };
+
 
 /* Валидация полей
    ========================================================================== */
@@ -173,6 +177,7 @@ const checkInput = (input) => {
 
 const rollBackStyle = (element) => element.style.boxShadow = null;
 
+
 /* Фильтрация объявлений
    ========================================================================== */
 
@@ -194,8 +199,8 @@ const filterPrice = (valueSelect, valueAd) => {
       return false;
 
     } else if (valueSelect === 'middle' &&
-               (valueAd <= Housing_Price.Middle.FROM ||
-                 valueAd >= Housing_Price.Middle.TO)) {
+               (valueAd < Housing_Price.Middle.FROM ||
+                 valueAd > Housing_Price.Middle.TO)) {
 
       return false;
 

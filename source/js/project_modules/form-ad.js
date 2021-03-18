@@ -21,8 +21,10 @@ const MESSAGE_ERROR_FORMAT_ADDRESS = 'Введите координаты в ф�
 const formAdElement = document.querySelector('.ad-form');
 const formAdElements = formAdElement.querySelectorAll('.ad-form-header, .ad-form__element');
 
+//кнопка reset
 const resetElement = formAdElement.querySelector('.ad-form__reset');
 
+//поля и селекторы формы объявления
 const titleElement = formAdElement.querySelector('#title');
 const addressElement = formAdElement.querySelector('#address');
 

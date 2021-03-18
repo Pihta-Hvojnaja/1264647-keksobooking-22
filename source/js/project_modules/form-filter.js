@@ -10,9 +10,11 @@ import {
 /* Переменные
    ========================================================================== */
 
+//форма фильтра
 const formFilterElement = document.querySelector('.map__filters');
 const formFilterElements = formFilterElement.querySelectorAll('.map__filter, .map__features');
 
+//элементы формы фильтра
 const typeElement = formFilterElement.querySelector('#housing-type');
 const priceElement = formFilterElement.querySelector('#housing-price');
 const roomsElement = formFilterElement.querySelector('#housing-rooms');
