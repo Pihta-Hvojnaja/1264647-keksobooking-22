@@ -2,7 +2,26 @@
 /* Переменные
    ========================================================================== */
 
+const MinPriceHousing = {
+  BUNGALOW: 0,
+  FLAT: 1000,
+  HOUSE: 5000,
+  PALACE: 10000,
+};
+
+const DEFAULT_FILTER_VALUE = 'any';
+
+const Housing_Price = {
+  LOW: 10000,
+  Middle: {
+    FROM: 10000,
+    TO: 50000,
+  },
+  HIGH: 50000,
+};
+
 const TEMPLATE_IMG_TYPE = /png|jpeg?/i;
+const MESSAGE_ERROR_TYPE_IMG = 'Пожалуйста, загрузите изображение формата png или jpeg!';
 
 
 /* Вкл - Выкл элементов
@@ -24,16 +43,14 @@ const enableElements = (parent, children) => {
   }
 };
 
+
 /* Проверка событий
    ========================================================================== */
-
-const isClickEvent = (evt) => {
-  return evt.type === 'click';
-};
 
 const isEscEvent = (evt) => {
   return evt.key === ('Escape' || 'Esc');
 };
+
 
 /* Размещение похожих объявлений в балунах
    ========================================================================== */
@@ -62,6 +79,7 @@ const addInnerElements = (parent, items, htmlTag) => {
   });
 }
 
+
 /* Корреляция значений полей
    ========================================================================== */
 
@@ -80,14 +98,14 @@ const compareTypes = (type) => {
 
 const getMinPrice = (type) => {
   switch (type) {
-    case 'flat':
-      return 1000;
     case 'bungalow':
-      return 0;
+      return MinPriceHousing.BUNGALOW;
+    case 'flat':
+      return MinPriceHousing.FLAT;
     case 'house':
-      return 5000;
+      return MinPriceHousing.HOUSE;
     case 'palace':
-      return 10000;
+      return MinPriceHousing.PALACE;
   }
 };
 
@@ -101,6 +119,7 @@ const setMinPrice = (fromSelect, forInput) => {
 const correlateOptions = (fromOption, forOption) => {
   forOption.selectedIndex = fromOption.selectedIndex;
 };
+
 
 /* Валидация полей
    ========================================================================== */
@@ -127,7 +146,7 @@ const validateSelector = (quantityRooms, quantityGuests, selectMessageError) => 
   }
 };
 
-const switchMessageError = (validityStatus, selectMessageError, selectFocus) => {
+const showMessageError = (validityStatus, selectMessageError, selectFocus) => {
 
   if (validityStatus) {
     selectMessageError.setCustomValidity('');
@@ -158,6 +177,7 @@ const checkInput = (input) => {
 
 const rollBackStyle = (element) => element.style.boxShadow = null;
 
+
 /* Фильтрация объявлений
    ========================================================================== */
 
@@ -166,22 +186,25 @@ const rollBackStyle = (element) => element.style.boxShadow = null;
  */
 
 const filterType = (valueSelect, valueAd) => {
-  return (valueSelect !== valueAd && valueSelect !== 'any') ? false : true;
+  return (valueSelect !== valueAd && valueSelect !== DEFAULT_FILTER_VALUE) ? false : true;
 };
 
 const filterPrice = (valueSelect, valueAd) => {
-  if (valueSelect === 'any') {
+  if (valueSelect === DEFAULT_FILTER_VALUE) {
     return true;
 
   } else {
 
-    if (valueSelect === 'low' && valueAd > 10000) {
+    if (valueSelect === 'low' && valueAd > Housing_Price.LOW) {
       return false;
 
-    } else if (valueSelect === 'middle' && (valueAd <= 10000 || valueAd >= 50000)) {
+    } else if (valueSelect === 'middle' &&
+               (valueAd < Housing_Price.Middle.FROM ||
+                 valueAd > Housing_Price.Middle.TO)) {
+
       return false;
 
-    } else if (valueSelect === 'high' && valueAd < 50000) {
+    } else if (valueSelect === 'high' && valueAd < Housing_Price.HIGH) {
       return false;
 
     } else {
@@ -192,7 +215,7 @@ const filterPrice = (valueSelect, valueAd) => {
 
 const filterRoomsGuests = (valueSelect, valueAd) => {
   valueAd = String(valueAd);
-  return (valueSelect !== valueAd && valueSelect !== 'any') ? false : true;
+  return (valueSelect !== valueAd && valueSelect !== DEFAULT_FILTER_VALUE) ? false : true;
 };
 
 /**
@@ -232,7 +255,7 @@ const checkFileChooser = (fileType, input, delay) => {
     return true;
 
   } else {
-    input.setCustomValidity('Пожалуйста, загрузите изображение формата png или jpeg!');
+    input.setCustomValidity(MESSAGE_ERROR_TYPE_IMG);
     input.reportValidity();
 
     setTimeout(
@@ -293,7 +316,6 @@ const debounce = (cb, timeout) => {
 export {
   disableElements,
   enableElements,
-  isClickEvent,
   isEscEvent,
   hideElement,
   addInnerElements,
@@ -301,7 +323,7 @@ export {
   setMinPrice,
   correlateOptions,
   validateSelector,
-  switchMessageError,
+  showMessageError,
   checkInput,
   rollBackStyle,
   filterType,

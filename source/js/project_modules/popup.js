@@ -8,8 +8,7 @@ import {
 /* Переменные
    ========================================================================== */
 
-const mapPopupTemplate = document.querySelector('#card').content.querySelector('.popup');
-
+const mapPopupTemplateElement = document.querySelector('#card').content.querySelector('.popup');
 
 /* Функции
    ========================================================================== */
@@ -19,11 +18,10 @@ const mapPopupTemplate = document.querySelector('#card').content.querySelector('
  */
 
 const createPopup = (ad) => {
-  const mapPopup = mapPopupTemplate.cloneNode(true);
-  let element;
+  const mapPopupElement = mapPopupTemplateElement.cloneNode(true);
 
   //Аватарка
-  element = mapPopup.querySelector('.popup__avatar');
+  let element = mapPopupElement.querySelector('.popup__avatar');
   if (ad.author.avatar) {
     element.src = ad.author.avatar;
   } else {
@@ -31,7 +29,7 @@ const createPopup = (ad) => {
   }
 
   //Заголовок
-  element = mapPopup.querySelector('.popup__title');
+  element = mapPopupElement.querySelector('.popup__title');
   if (ad.offer.title) {
     element.textContent = ad.offer.title;
   } else {
@@ -39,7 +37,7 @@ const createPopup = (ad) => {
   }
 
   //Адрес
-  element = mapPopup.querySelector('.popup__text--address');
+  element = mapPopupElement.querySelector('.popup__text--address');
   if (ad.offer.address) {
     element.textContent = ad.offer.address;
   } else {
@@ -47,7 +45,7 @@ const createPopup = (ad) => {
   }
 
   //Цена
-  element = mapPopup.querySelector('.popup__text--price');
+  element = mapPopupElement.querySelector('.popup__text--price');
   if (ad.offer.price || ad.offer.price === 0) {
     element.innerHTML = `${ad.offer.price} <span>₽/ночь</span>`;
   } else {
@@ -55,7 +53,7 @@ const createPopup = (ad) => {
   }
 
   //Тип жилья
-  element = mapPopup.querySelector('.popup__type');
+  element = mapPopupElement.querySelector('.popup__type');
   if (ad.offer.type) {
     element.textContent = compareTypes(ad.offer.type);
   } else {
@@ -63,7 +61,7 @@ const createPopup = (ad) => {
   }
 
   //Вместимость жилья
-  element = mapPopup.querySelector('.popup__text--capacity');
+  element = mapPopupElement.querySelector('.popup__text--capacity');
 
   if ((ad.offer.rooms || ad.offer.rooms === 0) &&
       (ad.offer.guests || ad.offer.guests === 0)) {
@@ -74,7 +72,7 @@ const createPopup = (ad) => {
   }
 
   //Время аренды
-  element = mapPopup.querySelector('.popup__text--time');
+  element = mapPopupElement.querySelector('.popup__text--time');
   if (ad.offer.checkin && ad.offer.checkout) {
     element.textContent = `Заезд после ${ad.offer.checkin}, выезд до ${ad.offer.checkout}`;
   } else {
@@ -82,7 +80,7 @@ const createPopup = (ad) => {
   }
 
   //Описание жилья
-  element = mapPopup.querySelector('.popup__description');
+  element = mapPopupElement.querySelector('.popup__description');
   if (ad.offer.description) {
     element.textContent = ad.offer.description;
   } else {
@@ -90,12 +88,12 @@ const createPopup = (ad) => {
   }
 
   //Фичи
-  addInnerElements(mapPopup.querySelector('.popup__features'), ad.offer.features, 'li');
+  addInnerElements(mapPopupElement.querySelector('.popup__features'), ad.offer.features, 'li');
 
   //Фотографии жилья
-  addInnerElements(mapPopup.querySelector('.popup__photos'), ad.offer.photos, 'img');
+  addInnerElements(mapPopupElement.querySelector('.popup__photos'), ad.offer.photos, 'img');
 
-  return mapPopup;
+  return mapPopupElement;
 };
 
 export { createPopup };

@@ -1,5 +1,4 @@
 import {
-  isClickEvent,
   isEscEvent
 } from './util.js';
 
@@ -7,15 +6,18 @@ import {
    ========================================================================== */
 
 const ALERT_SHOW_TIME = 5000;
-const alertPlace = document.querySelector('.map__canvas');
 
-const noticePlase = document.querySelector('main');
+//места размещения сообщений
+const alertPlaceElement = document.querySelector('.map__canvas');
+const noticePlaseElement = document.querySelector('main');
 
-const noticeFailTemplate = document.querySelector('#error').content.querySelector('.error');
-const noticeFail = noticeFailTemplate.cloneNode(true);
+//сообщение о неудачной отпраке данных
+const noticeFailTemplateElement = document.querySelector('#error').content.querySelector('.error');
+const noticeFailElement = noticeFailTemplateElement.cloneNode(true);
 
-const noticeLuckTemplate = document.querySelector('#success').content.querySelector('.success');
-const noticeLuck = noticeLuckTemplate.cloneNode(true);
+//сообщение об удачной отпраке данных
+const noticeLuckTemplateElement = document.querySelector('#success').content.querySelector('.success');
+const noticeLuckElement = noticeLuckTemplateElement.cloneNode(true);
 
 
 /* Функции
@@ -41,7 +43,7 @@ const showAlert = (message) => {
 
   messageContainer.textContent = message;
 
-  alertPlace.append(messageContainer);
+  alertPlaceElement.append(messageContainer);
 
   setTimeout(
     () => messageContainer.remove(),
@@ -57,23 +59,32 @@ const showAlert = (message) => {
 const showNotice = (fail) => {
   let notice;
 
-  (fail) ? notice = noticeFail : notice = noticeLuck;
+  (fail) ? notice = noticeFailElement : notice = noticeLuckElement;
 
   notice.style.zIndex = 10000;
-  noticePlase.append(notice);
+  noticePlaseElement.append(notice);
 
-  const closeNotice = (evt) => {
+  const removeListeners = () => {
+    document.removeEventListener('keydown', onDocumentKeydown);
+    document.removeEventListener('click', onDocumentClick);
+  };
 
-    if (isClickEvent(evt) || isEscEvent(evt)) {
+  const onDocumentClick = () => {
+    notice.remove();
+    removeListeners();
+  };
+
+  const onDocumentKeydown = (evt) => {
+
+    if (isEscEvent(evt)) {
       notice.remove();
     }
 
-    document.removeEventListener('keydown', closeNotice);
-    document.removeEventListener('click', closeNotice);
+    removeListeners();
   };
 
-  document.addEventListener('click', closeNotice);
-  document.addEventListener('keydown', closeNotice);
+  document.addEventListener('click', onDocumentClick);
+  document.addEventListener('keydown', onDocumentKeydown);
 };
 
 export { showAlert, showNotice }

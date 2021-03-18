@@ -10,17 +10,17 @@ import {
 } from './util.js';
 
 import {
-  deactivatingFormFilter,
-  activatingFormFilter,
+  deactivateFormFilter,
+  activateFormFilter,
   compareAdAndFilter,
-  addHandlerChange
+  onFormFilterChange
 } from './form-filter.js';
 
 import {
   passRollBackMap,
   passCreateMarkersAds,
-  deactivatingFormAd,
-  activatingFormAd,
+  deactivateFormAd,
+  activateFormAd,
   blockAddressInput,
   getAddress
 
@@ -34,15 +34,18 @@ import { createPopup } from './popup.js';
    ========================================================================== */
 
 const AD_QUANTITY = 10;
+
+//координаты центра карты, масштаб
 const [TOKYO_LAT, TOKYO_LNG] = [35.6895, 139.692];
 const TOKYO_ZOOM = 10;
 
+//главный маркер
 const MAIN_ICON_URL = '../img/main-pin.svg';
 const MAIN_ICON_SIZES = [50, 82];
 const MAIN_ANCHOR_SIZES = [25, 82];
-
 const [MAIN_MARKER_LAT, MAIN_MARKER_LNG] = [35.6895, 139.692];
 
+//дополнительные маркеры
 const ICON_URL = '../img/pin.svg';
 const ICON_SIZES = [25, 41];
 const ANCHOR_SIZES = [12.5, 41];
@@ -107,15 +110,19 @@ const rollBackMap = () => {
  * Отрисовывает метки похожих объявлений, активирует формы
  */
 
-const activateMarkersAndAd = () => {
+const onMapLoad = () => {
   mainMarker.addTo(map);
 
+  //блокируем поле адрес для редактирования
+  blockAddressInput();
+
+  //получаем данные объявлений и создаем метки объявлений
   getData(
     (ads) => {
       //создание меток похожих объявлений
       createMarkersAds(ads);
       //обработчик изменений фильтра
-      addHandlerChange(
+      onFormFilterChange(
         debounce(
           () => createMarkersAds(ads),
 
@@ -123,10 +130,8 @@ const activateMarkersAndAd = () => {
         ),
       );
       //активация фильтра карты
-      activatingFormFilter(
-        (parent, children) => {
-          enableElements(parent, children);
-        },
+      activateFormFilter(
+        (parent, children) => enableElements(parent, children),
       );
       //передаем ф-цию createMarkersAds в form-ad.js для сброса меток
       passCreateMarkersAds(() => createMarkersAds(ads));
@@ -134,8 +139,7 @@ const activateMarkersAndAd = () => {
 
     () => showAlert('Не удалось загрузить похожие объявления!'),
   );
-  //блокируем поле адрес для редактирования
-  blockAddressInput();
+
   //отдаем ф-цию rollBackMap в form-ad.js
   passRollBackMap(() => rollBackMap());
 };
@@ -144,16 +148,12 @@ const activateMarkersAndAd = () => {
 /* Деактивация фильтра карты и формы заполнения объявления
    ========================================================================== */
 
-deactivatingFormFilter(
-  (parent, children) => {
-    disableElements(parent, children);
-  },
+deactivateFormFilter(
+  (parent, children) => disableElements(parent, children),
 );
 
-deactivatingFormAd(
-  (parent, children) => {
-    disableElements(parent, children);
-  },
+deactivateFormAd(
+  (parent, children) => disableElements(parent, children),
 );
 
 
@@ -202,16 +202,14 @@ L.tileLayer(
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   },
 ).addTo(map)
-  .once('tileload', activateMarkersAndAd);
+  .once('tileload', onMapLoad);
 
 /**
  * Активируем форму создания объявления
  */
 
-activatingFormAd(
-  (parent, children) => {
-    enableElements(parent, children);
-  },
+activateFormAd(
+  (parent, children) => enableElements(parent, children),
 );
 
 
