@@ -47,7 +47,7 @@ const createPopup = (ad) => {
   //Цена
   element = mapPopupElement.querySelector('.popup__text--price');
   if (ad.offer.price || ad.offer.price === 0) {
-    element.innerHTML = `${ad.offer.price} <span>₽/ночь</span>`;
+    element.textContent = `${ad.offer.price} ₽/ночь`;
   } else {
     hideElement(element);
   }
