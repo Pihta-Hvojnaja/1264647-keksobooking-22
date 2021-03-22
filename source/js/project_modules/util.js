@@ -294,7 +294,7 @@ const debounce = (cb, delay) => {
   return () => {
     clearTimeout(timeout);
     timeout = setTimeout(cb, delay);
-  }
+  };
 };
 
 export {
