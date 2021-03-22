@@ -11,7 +11,7 @@ const MinPriceHousing = {
 
 const DEFAULT_FILTER_VALUE = 'any';
 
-const Housing_Price = {
+const HousingPrice = {
   LOW: 10000,
   Middle: {
     FROM: 10000,
@@ -186,36 +186,33 @@ const rollBackStyle = (element) => element.style.boxShadow = null;
  */
 
 const filterType = (valueSelect, valueAd) => {
-  return (valueSelect !== valueAd && valueSelect !== DEFAULT_FILTER_VALUE) ? false : true;
+  return valueSelect === valueAd || valueSelect === DEFAULT_FILTER_VALUE;
 };
 
 const filterPrice = (valueSelect, valueAd) => {
   if (valueSelect === DEFAULT_FILTER_VALUE) {
     return true;
+  }
 
-  } else {
+  if (valueSelect === 'low' && valueAd < HousingPrice.LOW) {
+    return true;
+  }
 
-    if (valueSelect === 'low' && valueAd > Housing_Price.LOW) {
-      return false;
+  if (valueSelect === 'middle' &&
+              (valueAd > HousingPrice.Middle.FROM &&
+                valueAd < HousingPrice.Middle.TO)) {
 
-    } else if (valueSelect === 'middle' &&
-               (valueAd < Housing_Price.Middle.FROM ||
-                 valueAd > Housing_Price.Middle.TO)) {
+    return true;
+  }
 
-      return false;
-
-    } else if (valueSelect === 'high' && valueAd < Housing_Price.HIGH) {
-      return false;
-
-    } else {
-      return true;
-    }
+  if (valueSelect === 'high' && valueAd > HousingPrice.HIGH) {
+    return true;
   }
 };
 
 const filterRoomsGuests = (valueSelect, valueAd) => {
   valueAd = String(valueAd);
-  return (valueSelect !== valueAd && valueSelect !== DEFAULT_FILTER_VALUE) ? false : true;
+  return valueSelect === valueAd || valueSelect === DEFAULT_FILTER_VALUE;
 };
 
 /**
@@ -291,27 +288,14 @@ const showPreview = (elementInput, elementImg, delay) => {
 /* Устранение дребезга
    ========================================================================== */
 
-const debounce = (cb, timeout) => {
-  let isCooldown = false;
+const debounce = (cb, delay) => {
+  let timeout;
 
   return () => {
-
-    if (isCooldown) {
-      return;
-    }
-
-    cb();
-
-    isCooldown = true;
-
-    setTimeout(
-      () => isCooldown = false,
-
-      timeout,
-    );
-  };
+    clearTimeout(timeout);
+    timeout = setTimeout(cb, delay);
+  }
 };
-
 
 export {
   disableElements,
