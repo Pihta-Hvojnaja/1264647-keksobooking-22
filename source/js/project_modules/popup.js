@@ -1,7 +1,7 @@
 import {
-  hideElement,
   addInnerElements,
-  compareTypes
+  compareTypes,
+  hideElement
 } from './util.js';
 
 

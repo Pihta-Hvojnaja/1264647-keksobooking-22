@@ -1,10 +1,11 @@
 import {
-  setMinPrice,
-  correlateOptions,
-  validateSelector,
-  showMessageError,
   checkInput,
-  rollBackStyle
+  correlateOptions,
+  resetError,
+  rollBackStyle,
+  setMinPrice,
+  showMessageError,
+  validateSelector
 } from './util.js';
 
 import { sendData } from './api.js';
@@ -154,7 +155,7 @@ checkInput(titleElement);
 
 if (addressElement.readOnly === false) {
   addressElement.addEventListener('input', () => {
-    addressElement.setCustomValidity('');
+    resetError(addressElement);
     addressElement.reportValidity();
 
     if (addressElement.validity.valid) {
@@ -216,10 +217,10 @@ guestsElement.addEventListener('change', () => {
 });
 
 export {
-  passRollBackMap,
-  passCreateMarkersAds,
   activateFormAd,
-  deactivateFormAd,
   blockAddressInput,
-  getAddress
+  deactivateFormAd,
+  getAddress,
+  passCreateMarkersAds,
+  passRollBackMap
 };

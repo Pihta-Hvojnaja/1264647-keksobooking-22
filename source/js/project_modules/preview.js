@@ -1,11 +1,10 @@
-import { showPreview } from './util.js';
+import { resetError, showPreview } from './util.js';
 
 
 /* Переменные
    ========================================================================== */
 
 const AVATAR_DEFAULT_URL = 'img/muffin-grey.svg';
-const DELAY = 1000;
 const TAG_IMG = '<img src="" width="70" height="70">';
 
 //Поля загрузки для фото аватарки
@@ -34,6 +33,9 @@ const resetPreview = () => {
     previewContainerElement.removeChild(previewHousingElement);
   }
 
+  resetError(fileChooserAvatarElement);
+  resetError(fileChooserHousingElement);
+
   previewHousingElement = null;
 };
 
@@ -46,7 +48,7 @@ const resetPreview = () => {
  */
 
 fileChooserAvatarElement.addEventListener('change', () => {
-  if (!showPreview(fileChooserAvatarElement, previewAvatarElement, DELAY)) {
+  if (!showPreview(fileChooserAvatarElement, previewAvatarElement)) { //если превью не загружено, показать дефолтную картинку
     previewAvatarElement.src = AVATAR_DEFAULT_URL;
   }
 });
@@ -62,7 +64,7 @@ fileChooserHousingElement.addEventListener('change', () => {
     previewHousingElement = photoContainerElement.querySelector('.ad-form__photo img');
   }
 
-  if (!showPreview(fileChooserHousingElement, previewHousingElement, DELAY)) {
+  if (!showPreview(fileChooserHousingElement, previewHousingElement)) {
     previewContainerElement.removeChild(previewHousingElement);
     previewHousingElement = null;
   }
