@@ -121,6 +121,14 @@ const correlateOptions = (fromOption, forOption) => {
 };
 
 
+/* Сброс состояния ошибки элемента
+   ========================================================================== */
+
+const resetError = (element) => {
+  element.setCustomValidity('');
+};
+
+
 /* Валидация полей
    ========================================================================== */
 
@@ -149,8 +157,8 @@ const validateSelector = (quantityRooms, quantityGuests, selectMessageError) => 
 const showMessageError = (validityStatus, selectMessageError, selectFocus) => {
 
   if (validityStatus) {
-    selectMessageError.setCustomValidity('');
-    selectFocus.setCustomValidity('');
+    resetError(selectMessageError);
+    resetError(selectFocus);
 
     selectMessageError.style.boxShadow = '0 0 1px 0 #008000';
     selectFocus.style.boxShadow = '0 0 1px 0 #008000';
@@ -233,7 +241,7 @@ const compareCheckedValue = (checkedValues, adFeatures) => {
   let result = true;
   checkedValues.forEach((element) => {
 
-    if(!adFeatures.includes(element)) {
+    if (!adFeatures.includes(element)) {
       result = false;
     }
   });
@@ -245,30 +253,25 @@ const compareCheckedValue = (checkedValues, adFeatures) => {
 /* Валидация превью
    ========================================================================== */
 
-const checkFileChooser = (fileType, input, delay) => {
+const checkFileChooser = (fileType, input) => {
 
   if (TEMPLATE_IMG_TYPE.test(fileType)) {
-    input.setCustomValidity('');
+
+    resetError(input);
+
     return true;
 
   } else {
     input.setCustomValidity(MESSAGE_ERROR_TYPE_IMG);
     input.reportValidity();
-
-    setTimeout(
-      () => input.setCustomValidity(''),
-      delay,
-    );
-
-    return false;
   }
 };
 
-const showPreview = (elementInput, elementImg, delay) => {
+const showPreview = (elementInput, elementImg) => {
   const file = elementInput.files[0];
   const fileType = file.type;
 
-  if(checkFileChooser(fileType, elementInput, delay)) {
+  if(checkFileChooser(fileType, elementInput)) {
     const reader = new FileReader();
 
     reader.addEventListener('load', () => {
@@ -278,9 +281,6 @@ const showPreview = (elementInput, elementImg, delay) => {
     reader.readAsDataURL(file);
 
     return true;
-
-  } else {
-    return false;
   }
 };
 
@@ -298,23 +298,24 @@ const debounce = (cb, delay) => {
 };
 
 export {
+  addInnerElements,
+  checkInput,
+  compareCheckedValue,
+  compareTypes,
+  correlateOptions,
+  debounce,
   disableElements,
   enableElements,
-  isEscEvent,
-  hideElement,
-  addInnerElements,
-  compareTypes,
-  setMinPrice,
-  correlateOptions,
-  validateSelector,
-  showMessageError,
-  checkInput,
-  rollBackStyle,
-  filterType,
   filterPrice,
   filterRoomsGuests,
+  filterType,
   getCheckedValue,
-  compareCheckedValue,
+  hideElement,
+  isEscEvent,
+  resetError,
+  rollBackStyle,
+  setMinPrice,
+  showMessageError,
   showPreview,
-  debounce
+  validateSelector
 };

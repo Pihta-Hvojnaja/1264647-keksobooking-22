@@ -4,26 +4,25 @@ import 'leaflet/dist/leaflet.css';
 import { getData } from './api.js';
 
 import {
+  debounce,
   disableElements,
-  enableElements,
-  debounce
+  enableElements
 } from './util.js';
 
 import {
-  deactivateFormFilter,
   activateFormFilter,
   compareAdAndFilter,
+  deactivateFormFilter,
   onFormFilterChange
 } from './form-filter.js';
 
 import {
-  passRollBackMap,
-  passCreateMarkersAds,
-  deactivateFormAd,
   activateFormAd,
   blockAddressInput,
-  getAddress
-
+  deactivateFormAd,
+  getAddress,
+  passCreateMarkersAds,
+  passRollBackMap
 } from './form-ad.js';
 
 import { showAlert } from './notification.js';
@@ -102,7 +101,7 @@ const createMarkersAds = (ads) => {
  */
 
 const rollBackMap = () => {
-  map.setView([TOKYO_LAT, TOKYO_LNG]);
+  map.setView([TOKYO_LAT, TOKYO_LNG], TOKYO_ZOOM);
   mainMarker.setLatLng([MAIN_MARKER_LAT, MAIN_MARKER_LNG]);
 };
 

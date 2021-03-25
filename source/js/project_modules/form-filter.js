@@ -1,9 +1,9 @@
 import {
-  filterType,
+  compareCheckedValue,
   filterPrice,
   filterRoomsGuests,
-  getCheckedValue,
-  compareCheckedValue
+  filterType,
+  getCheckedValue
 } from './util.js';
 
 
@@ -51,41 +51,17 @@ const onFormFilterChange = (cb) => {
  */
 
 const compareAdAndFilter = (ad) => {
-
-  //фильтрация "тип жилья"
-  if (!filterType(typeElement.value, ad.offer.type)) {
-    return false;
-  }
-
-  //фильтрация "цена"
-  if (!filterPrice(priceElement.value, ad.offer.price)) {
-    return false;
-  }
-
-  //фильтрация "кол-во комнат"
-  if (!filterRoomsGuests(roomsElement.value, ad.offer.rooms)) {
-    return false;
-  }
-
-  //фильтрация "кол-во гостей"
-  if (!filterRoomsGuests(guestsElement.value, ad.offer.guests)) {
-    return false;
-  }
-
-  //фильтрация "особенности"
-  const resultCompare = compareCheckedValue(getCheckedValue(featuresElement), ad.offer.features);
-
-  if (resultCompare === false) {
-    return false;
-  }
-
-  return true;
+  return filterType(typeElement.value, ad.offer.type) && //фильтрация "тип жилья"
+         filterPrice(priceElement.value, ad.offer.price) && //фильтрация "цена"
+         filterRoomsGuests(roomsElement.value, ad.offer.rooms) && //фильтрация "кол-во комнат"
+         filterRoomsGuests(guestsElement.value, ad.offer.guests) && //фильтрация "кол-во гостей"
+         compareCheckedValue(getCheckedValue(featuresElement), ad.offer.features); //фильтрация "особенности"
 };
 
 export {
-  resetFormFilter,
-  deactivateFormFilter,
   activateFormFilter,
   compareAdAndFilter,
-  onFormFilterChange
+  deactivateFormFilter,
+  onFormFilterChange,
+  resetFormFilter
 };
